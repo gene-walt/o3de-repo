@@ -14,13 +14,13 @@ namespace Umbra
     {
         BaseClass::Reflect(context);
 
-        if (AZ::SerializeContext* serializeContext = azrtti_cast<AZ::SerializeContext*>(context))
+        if (auto serializeContext = azrtti_cast<AZ::SerializeContext*>(context))
         {
             serializeContext->Class<EditorUmbraComponent, BaseClass>()
                 ->Version(0)
                 ;
 
-            if (AZ::EditContext* editContext = serializeContext->GetEditContext())
+            if (auto editContext = serializeContext->GetEditContext())
             {
                 editContext->Class<EditorUmbraComponent>(
                     "Umbra", "The Umbra component")
@@ -39,7 +39,8 @@ namespace Umbra
         {
             behaviorContext->ConstantProperty(UmbraEditorSystemComponentTypeId, BehaviorConstant(AZ::Uuid(UmbraEditorSystemComponentTypeId)))
                 ->Attribute(AZ::Script::Attributes::Module, "render")
-                ->Attribute(AZ::Script::Attributes::Scope, AZ::Script::Attributes::ScopeFlags::Automation);
+                ->Attribute(AZ::Script::Attributes::Scope, AZ::Script::Attributes::ScopeFlags::Automation)
+                ;
         }
     }
 
@@ -61,4 +62,4 @@ namespace Umbra
     {
         BaseClass::Deactivate();
     }
-}
+} // namespace Umbra

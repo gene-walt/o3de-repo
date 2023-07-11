@@ -5,8 +5,10 @@
 
 #pragma once
 
+#include <AzCore/Asset/AssetCommon.h>
+#include <AzCore/Asset/AssetManager.h>
 #include <AzCore/Component/Component.h>
-#include <AzCore/Component/TickBus.h>
+#include <Clients/UmbraAsset.h>
 #include <Umbra/UmbraBus.h>
 
 namespace Umbra
@@ -35,6 +37,8 @@ namespace Umbra
         void Init() override;
         void Activate() override;
         void Deactivate() override;
+
+        AZStd::unique_ptr<UmbraAssetHandler> m_assetHandler;
     };
 
 } // namespace Umbra

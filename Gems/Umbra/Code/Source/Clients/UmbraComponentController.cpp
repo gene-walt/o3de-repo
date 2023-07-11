@@ -12,7 +12,7 @@ namespace Umbra
 {
     void UmbraComponentConfig::Reflect(AZ::ReflectContext* context)
     {
-        if (auto* serializeContext = azrtti_cast<AZ::SerializeContext*>(context))
+        if (auto serializeContext = azrtti_cast<AZ::SerializeContext*>(context))
         {
             serializeContext->Class<UmbraComponentConfig>()
                 ->Version(0)
@@ -24,19 +24,20 @@ namespace Umbra
     {
         UmbraComponentConfig::Reflect(context);
 
-        if (auto* serializeContext = azrtti_cast<AZ::SerializeContext*>(context))
+        if (auto serializeContext = azrtti_cast<AZ::SerializeContext*>(context))
         {
-            serializeContext->Class<UmbraComponentController>()->Version(0)->Field(
-                "Configuration", &UmbraComponentController::m_configuration)
+            serializeContext->Class<UmbraComponentController>()
+                ->Version(0)
+                ->Field("Configuration", &UmbraComponentController::m_configuration)
                 ;
 
-            if (AZ::EditContext* editContext = serializeContext->GetEditContext())
+            if (auto editContext = serializeContext->GetEditContext())
             {
                 editContext->Class<UmbraComponentController>("UmbraComponentController", "")
                     ->ClassElement(AZ::Edit::ClassElements::EditorData, "")
-                        ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
+                    ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
                     ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraComponentController::m_configuration, "Configuration", "")
-                        ->Attribute(AZ::Edit::Attributes::Visibility, AZ::Edit::PropertyVisibility::ShowChildrenOnly)
+                    ->Attribute(AZ::Edit::Attributes::Visibility, AZ::Edit::PropertyVisibility::ShowChildrenOnly)
                     ;
             }
         }

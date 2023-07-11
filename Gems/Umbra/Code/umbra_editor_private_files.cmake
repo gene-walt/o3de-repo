@@ -8,4 +8,8 @@ set(FILES
     Source/Tools/EditorUmbraComponent.h
     Source/Tools/UmbraEditorSystemComponent.cpp
     Source/Tools/UmbraEditorSystemComponent.h
+    Source/Tools/UmbraAssetBuilder.cpp
+    Source/Tools/UmbraAssetBuilder.h
+    Source/Tools/UmbraAssetBuilderComponent.cpp
+    Source/Tools/UmbraAssetBuilderComponent.h
 )

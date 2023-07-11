@@ -3,10 +3,10 @@
  * its licensors.
  */
 
-#include "UmbraSystemComponent.h"
 #include <AzCore/RTTI/BehaviorContext.h>
 #include <AzCore/Serialization/EditContext.h>
 #include <AzCore/Serialization/SerializeContext.h>
+#include <Clients/UmbraSystemComponent.h>
 #include <Umbra/UmbraTypeIds.h>
 
 namespace Umbra
@@ -15,10 +15,13 @@ namespace Umbra
 
     void UmbraSystemComponent::Reflect(AZ::ReflectContext* context)
     {
+        UmbraAsset::Reflect(context);
+
         if (auto serializeContext = azrtti_cast<AZ::SerializeContext*>(context))
         {
             serializeContext->Class<UmbraSystemComponent, AZ::Component>()
-                ->Version(0);
+                ->Version(0)
+                ;
         }
     }
 
@@ -63,12 +66,15 @@ namespace Umbra
 
     void UmbraSystemComponent::Activate()
     {
+        m_assetHandler.reset(aznew UmbraAssetHandler(UmbraAsset::DisplayName, UmbraAsset::Group, UmbraAsset::Extension));
+        m_assetHandler->Register();
         UmbraRequestBus::Handler::BusConnect();
     }
 
     void UmbraSystemComponent::Deactivate()
     {
         UmbraRequestBus::Handler::BusDisconnect();
+        m_assetHandler->Unregister();
+        m_assetHandler.reset();
     }
-
 } // namespace Umbra

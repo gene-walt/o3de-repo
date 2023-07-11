@@ -28,7 +28,8 @@ namespace Umbra
         {
             behaviorContext->ConstantProperty("UmbraComponentTypeId", BehaviorConstant(AZ::Uuid(UmbraComponentTypeId)))
                 ->Attribute(AZ::Script::Attributes::Module, "render")
-                ->Attribute(AZ::Script::Attributes::Scope, AZ::Script::Attributes::ScopeFlags::Common);
+                ->Attribute(AZ::Script::Attributes::Scope, AZ::Script::Attributes::ScopeFlags::Common)
+                ;
         }
     }
-}
+} // namespace Umbra

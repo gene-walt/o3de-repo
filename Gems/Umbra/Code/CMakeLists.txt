@@ -132,6 +132,7 @@ if(PAL_TRAIT_BUILD_HOST_TOOLS)
                 Source
         BUILD_DEPENDENCIES
             PUBLIC
+                AZ::AssetBuilderSDK
                 AZ::AzToolsFramework
                 $<TARGET_OBJECTS:Gem::${gem_name}.Private.Object>
                 Gem::Atom_Utils.Static

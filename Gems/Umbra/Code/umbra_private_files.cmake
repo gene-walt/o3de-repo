@@ -4,6 +4,8 @@
 #
 
 set(FILES
+    Source/Clients/UmbraAsset.cpp
+    Source/Clients/UmbraAsset.h
     Source/Clients/UmbraComponent.cpp
     Source/Clients/UmbraComponent.h
     Source/Clients/UmbraComponentController.cpp

@@ -4,6 +4,7 @@
  */
 
 #include <Tools/EditorUmbraComponent.h>
+#include <Tools/UmbraAssetBuilderComponent.h>
 #include <Tools/UmbraEditorSystemComponent.h>
 #include <Umbra/UmbraTypeIds.h>
 #include <UmbraModuleInterface.h>
@@ -22,6 +23,7 @@ namespace Umbra
             m_descriptors.insert(
                 m_descriptors.end(),
                 {
+                    UmbraAssetBuilderComponent::CreateDescriptor(),
                     UmbraEditorSystemComponent::CreateDescriptor(),
                     EditorUmbraComponent::CreateDescriptor(),
                 });
