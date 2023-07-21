@@ -62,6 +62,7 @@ ly_add_target(
             Gem::Atom_Utils.Static
             Gem::Atom_Feature_Common
             Gem::AtomLyIntegration_CommonFeatures.Static
+            ${O3DE_UMBRA_TARGET}
 )
 
 # Here add ${gem_name} target, it depends on the Private Object library and Public API interface
@@ -138,6 +139,7 @@ if(PAL_TRAIT_BUILD_HOST_TOOLS)
                 Gem::Atom_Utils.Static
                 Gem::Atom_Feature_Common.Static
                 Gem::AtomLyIntegration_CommonFeatures.Static
+                ${O3DE_UMBRA_TARGET}
     )
 
     ly_add_target(

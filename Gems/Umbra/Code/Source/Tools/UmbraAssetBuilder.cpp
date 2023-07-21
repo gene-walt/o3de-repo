@@ -15,6 +15,12 @@
 #include <Clients/UmbraAsset.h>
 #include <Tools/UmbraAssetBuilder.h>
 
+#include <umbra/optimizer/umbraLocalComputation.hpp>
+#include <umbra/optimizer/umbraScene.hpp>
+#include <umbra/runtime/umbraTome.hpp>
+#include <umbra/runtime/umbraQuery.hpp>
+#include <umbra/umbraInfo.hpp>
+
 namespace Umbra
 {
     namespace
@@ -86,8 +92,8 @@ namespace Umbra
         }
 
         // TODO: Load umbra scene data from source file
-        bool loaded = false;
-        if (!loaded)
+        Umbra::Scene* scene = Umbra::Scene::create(request.m_fullPath.c_str());
+        if (!scene)
         {
             AZ_Error("UmbraAssetBuilder", false, "Failed to load umbra scene data source file %s", request.m_fullPath.c_str());
             response.m_resultCode = AssetBuilderSDK::ProcessJobResult_Failed;
@@ -96,11 +102,41 @@ namespace Umbra
 
         AZ_TracePrintf("AssetBuilder", "Load umbra scene data succeeded\n");
 
-        // TODO: Compute visibility data from scene
-        bool processed = false;
-        if (!processed)
+        // TODO: Process scene data and convert into tome asset
+        // TODO: Make these settings configurable and include them with the source data
+        static const float COLLISION_RADIUS = 0.125f;
+        static const float SMALLEST_HOLE = 0.5f;
+        static const float SMALLEST_OCCLUDER = 3.f;
+
+        float collisionRadius = COLLISION_RADIUS;
+        float smallestHole = SMALLEST_HOLE;
+        float smallestOccluder = SMALLEST_OCCLUDER;
+
+        Umbra::ComputationParams params;
+        params.setParam(Umbra::ComputationParams::COLLISION_RADIUS, collisionRadius);
+        params.setParam(Umbra::ComputationParams::SMALLEST_HOLE, smallestHole);
+        params.setParam(Umbra::ComputationParams::SMALLEST_OCCLUDER, smallestOccluder);
+
+        Umbra::LocalComputation::Params localParams;
+        localParams.computationParams = &params;
+        localParams.scene = scene;
+        localParams.cacheSizeMegs = 100;
+
+        Umbra::Computation* computation = LocalComputation::create(localParams);
+        Umbra::Computation::Result result = computation->waitForResult();
+
+        if (result.error != Umbra::Computation::ERROR_OK)
         {
-            AZ_Error("UmbraAssetBuilder", false, "Failed to process umbra scene data %s", request.m_fullPath.c_str());
+            AZ_Error("UmbraAssetBuilder", false, "Failed to compile scene data: %s", result.errorStr);
+            computation->release();
+            response.m_resultCode = AssetBuilderSDK::ProcessJobResult_Failed;
+            return;
+        }
+
+        if (!result.tomeSize || result.tome == NULL)
+        {
+            AZ_Error("UmbraAssetBuilder", false, "Failed to get tome data from scene data");
+            computation->release();
             response.m_resultCode = AssetBuilderSDK::ProcessJobResult_Failed;
             return;
         }
@@ -109,6 +145,8 @@ namespace Umbra
 
         // TODO: Store visibility data tome buffer into umbra asset
         UmbraAsset umbraAsset;
+        umbraAsset.m_tomeBuffer.assign(reinterpret_cast<uint8_t*>(result.tome), reinterpret_cast<uint8_t*>(result.tome) + result.tomeSize);
+        computation->release();
 
         // Get file name from source file path, then replace the extension to generate product file name
         AZStd::string destFileName;
@@ -120,8 +158,7 @@ namespace Umbra
         AzFramework::StringFunc::Path::ConstructFull(request.m_tempDirPath.c_str(), destFileName.c_str(), destPath, true);
 
         // Save the asset to binary format for production
-        bool result = AZ::Utils::SaveObjectToFile(destPath, AZ::DataStream::ST_BINARY, &umbraAsset, umbraAsset.GetType(), nullptr);
-        if (!result)
+        if (!AZ::Utils::SaveObjectToFile(destPath, AZ::DataStream::ST_BINARY, &umbraAsset, umbraAsset.GetType(), nullptr))
         {
             AZ_Error("UmbraAssetBuilder", false, "Failed to save asset to cache") response.m_resultCode =
                 AssetBuilderSDK::ProcessJobResult_Failed;
