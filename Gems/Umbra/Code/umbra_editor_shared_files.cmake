@@ -4,5 +4,5 @@
 #
 
 set(FILES
-    Source/Tools/UmbraEditorModule.cpp
+    Source/UmbraEditorModule.cpp
 )

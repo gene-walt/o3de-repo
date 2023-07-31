@@ -4,10 +4,13 @@
  */
 
 #include <AzCore/Memory/Memory.h>
-#include <Clients/UmbraComponent.h>
-#include <Clients/UmbraSystemComponent.h>
 #include <Umbra/UmbraTypeIds.h>
 #include <UmbraModuleInterface.h>
+
+#include <UmbraLevelComponent/UmbraLevelComponent.h>
+#include <UmbraObjectComponent/UmbraObjectComponent.h>
+#include <UmbraSystemComponent/UmbraSystemComponent.h>
+#include <UmbraViewVolumeComponent/UmbraViewVolumeComponent.h>
 
 namespace Umbra
 {
@@ -21,8 +24,10 @@ namespace Umbra
         m_descriptors.insert(
             m_descriptors.end(),
             {
+                UmbraLevelComponent::CreateDescriptor(),
+                UmbraObjectComponent::CreateDescriptor(),
                 UmbraSystemComponent::CreateDescriptor(),
-                UmbraComponent::CreateDescriptor(),
+                UmbraViewVolumeComponent::CreateDescriptor(),
             });
     }
 

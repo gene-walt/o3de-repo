@@ -3,6 +3,8 @@
  * its licensors.
  */
 
+#pragma once
+
 #include <AzCore/Memory/Memory_fwd.h>
 #include <AzCore/Module/Module.h>
 #include <AzCore/RTTI/RTTIMacros.h>

@@ -4,5 +4,5 @@
 #
 
 set(FILES
-    Source/Clients/UmbraModule.cpp
+    Source/UmbraModule.cpp
 )
