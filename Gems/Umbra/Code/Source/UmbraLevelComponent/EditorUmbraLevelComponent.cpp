@@ -7,13 +7,21 @@
 #include <AzCore/Math/Vector3.h>
 #include <AzCore/RTTI/BehaviorContext.h>
 #include <AzCore/Serialization/SerializeContext.h>
+#include <AzCore/Utils/Utils.h>
+#include <AzQtComponents/Components/Widgets/FileDialog.h>
+#include <AzToolsFramework/API/EditorAssetSystemAPI.h>
+#include <AzToolsFramework/API/EditorWindowRequestBus.h>
 #include <AzToolsFramework/API/ToolsApplicationAPI.h>
+#include <AzToolsFramework/UI/UICore/WidgetHelpers.h>
 #include <Umbra/UmbraTomeAsset/UmbraTomeAsset.h>
 #include <UmbraLevelComponent/EditorUmbraLevelComponent.h>
 #include <UmbraLevelComponent/EditorUmbraLevelComponentUtil.h>
 
 #include <umbra/optimizer/umbraScene.hpp>
 #include <umbra/umbraInfo.hpp>
+
+#include <QMessageBox>
+#include <QObject>
 
 namespace Umbra
 {
@@ -82,23 +90,39 @@ namespace Umbra
 
     AZ::u32 EditorUmbraLevelComponent::GenerateUmbraScene()
     {
-        // Create the scene
+        // Prompt the user for a path to save the umbra scene
+        QFileInfo fileInfo = AzQtComponents::FileDialog::GetSaveFileName(
+            AzToolsFramework::GetActiveWindow(),
+            QString("Select Umbra Scene File Path"),
+            AZ::Utils::GetProjectPath().c_str(),
+            QString("Umbra Scene (*.umbrascene)"),
+            nullptr);
+
+        if (fileInfo.absoluteFilePath().isEmpty())
+        {
+            QMessageBox::information(
+                AzToolsFramework::GetActiveWindow(),
+                QObject::tr("Umbra Scene Not Saved"),
+                QObject::tr("Please select a valid save path."));
+            return AZ::Edit::PropertyRefreshLevels::AttributesAndValues;
+        }
+
+        // Create an umbra scene
         Umbra::Scene* scene = Umbra::Scene::create();
 
-        // Populate the scene with Models (geometry) and
-        // their transformed instances (Objects). Normally,
-        // the editor would do this, but in this case we
-        // just create a simple scene programmatically.
+        // TODO Replace all of the box geometry with geometry from level entities. This will require a bus with a common interface for
+        // reading vertex and index data from each entity.
 
-        // Our scene has only one box model, but multiple instances
-        float vertices[8 * 3] = {
+        // Create box geometry from a vertex and index lists to add test objects to the umbra scene.
+        float boxVertices[8 * 3] = {
             -1.f, -1.f, -1.f, 1.f, -1.f, -1.f, 1.f, 1.f, -1.f, -1.f, 1.f, -1.f,
             -1.f, -1.f, 1.f,  1.f, -1.f, 1.f,  1.f, 1.f, 1.f,  -1.f, 1.f, 1.f,
         };
-        UINT16 indices[12 * 3] = {
+        UINT16 boxIndices[12 * 3] = {
             0, 2, 1, 0, 3, 2, 1, 6, 5, 1, 2, 6, 4, 7, 0, 7, 3, 0, 7, 6, 3, 6, 2, 3, 4, 0, 5, 0, 1, 5, 5, 7, 4, 5, 6, 7,
         };
-        const Umbra::SceneModel* box = scene->insertModel(vertices, indices, 8, 12);
+
+        const Umbra::SceneModel* box = scene->insertModel(boxVertices, boxIndices, 8, 12);
 
         // Insert ten box objects into the scene
         for (int i = 0; i < 10; i++)
@@ -134,13 +158,18 @@ namespace Umbra
         Umbra::Vector3 mx = { { 25.f, 25.f, 25.f } };
         scene->insertViewVolume(mn, mx, 0);
 
-        // Scene can be serialized into a file. The resulting .scene
-        // file can be opened and inspected in umbra viewer.
-        // This serialization step isn't required for visibility computation.
-        const AZStd::string path = "D:/projects/amzn/O3DEUmbra3Gem/Gems/Umbra/Assets/test.umbrascene";
-        scene->writeToFile(path.c_str());
-        scene->release();
+        // The scene will be written to a file that can be picked up by the asset processor and converted into an umbra tome.
+        if (!scene->writeToFile(fileInfo.absoluteFilePath().toUtf8().constData()))
+        {
+            QMessageBox::information(
+                AzToolsFramework::GetActiveWindow(),
+                QObject::tr("Umbra Scene Not Saved"),
+                QObject::tr("Umbra Scene could not be saved."));
+            scene->release();
+            return AZ::Edit::PropertyRefreshLevels::AttributesAndValues;
+        }
 
-        return AZ::Edit::PropertyRefreshLevels::EntireTree;
+        scene->release();
+        return AZ::Edit::PropertyRefreshLevels::AttributesAndValues;
     }
 } // namespace Umbra
