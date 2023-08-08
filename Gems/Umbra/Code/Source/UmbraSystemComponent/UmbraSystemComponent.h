@@ -11,7 +11,7 @@
 
 namespace Umbra
 {
-    //!
+    //! Manages reflection of system level data types for the gem.
     class UmbraSystemComponent final
         : public AzFramework::Components::ComponentAdapter<UmbraSystemComponentController, UmbraSystemComponentConfig>
     {

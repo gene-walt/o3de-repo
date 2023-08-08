@@ -6,37 +6,37 @@
 #include <AzCore/Component/Entity.h>
 #include <AzCore/Serialization/EditContext.h>
 #include <AzCore/Serialization/SerializeContext.h>
-#include <UmbraTomeAsset/UmbraTomeAssetBuilder.h>
-#include <UmbraTomeAsset/UmbraTomeAssetBuilderComponent.h>
+#include <UmbraSceneAsset/UmbraSceneAssetBuilder.h>
+#include <UmbraSceneAsset/UmbraSceneAssetBuilderComponent.h>
 
 namespace Umbra
 {
-    void UmbraTomeAssetBuilderComponent::Reflect(AZ::ReflectContext* context)
+    void UmbraSceneAssetBuilderComponent::Reflect(AZ::ReflectContext* context)
     {
         if (auto serializeContext = azrtti_cast<AZ::SerializeContext*>(context))
         {
-            serializeContext->Class<UmbraTomeAssetBuilderComponent, AZ::Component>()
+            serializeContext->Class<UmbraSceneAssetBuilderComponent, AZ::Component>()
                 ->Version(0)
                 ->Attribute(AZ::Edit::Attributes::SystemComponentTags, AZStd::vector<AZ::Crc32>({ AssetBuilderSDK::ComponentTags::AssetBuilder }))
                 ;
         }
     }
 
-    UmbraTomeAssetBuilderComponent::UmbraTomeAssetBuilderComponent()
+    UmbraSceneAssetBuilderComponent::UmbraSceneAssetBuilderComponent()
     {
     }
 
-    UmbraTomeAssetBuilderComponent::~UmbraTomeAssetBuilderComponent()
+    UmbraSceneAssetBuilderComponent::~UmbraSceneAssetBuilderComponent()
     {
     }
 
-    void UmbraTomeAssetBuilderComponent::Activate()
+    void UmbraSceneAssetBuilderComponent::Activate()
     {
         // Register asset workers
-        m_assetWorkers.emplace_back(MakeAssetBuilder<UmbraTomeAssetBuilder>());
+        m_assetWorkers.emplace_back(MakeAssetBuilder<UmbraSceneAssetBuilder>());
     }
 
-    void UmbraTomeAssetBuilderComponent::Deactivate()
+    void UmbraSceneAssetBuilderComponent::Deactivate()
     {
         m_assetWorkers.clear();
     }

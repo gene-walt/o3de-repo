@@ -11,7 +11,7 @@
 
 namespace Umbra
 {
-    //!
+    //! The view volume component can be added to entities with shape components to define areas where the camera can move for the occlusion system.
     class UmbraViewVolumeComponent final
         : public AzFramework::Components::ComponentAdapter<UmbraViewVolumeComponentController, UmbraViewVolumeComponentConfig>
     {

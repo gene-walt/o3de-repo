@@ -31,18 +31,21 @@ namespace Umbra
         }
     }
 
-    void UmbraViewVolumeComponentController::GetProvidedServices(AZ::ComponentDescriptor::DependencyArrayType& provided)
+    void UmbraViewVolumeComponentController::GetProvidedServices(AZ::ComponentDescriptor::DependencyArrayType& services)
     {
-        provided.push_back(AZ_CRC_CE("UmbraViewVolumeService"));
+        services.push_back(AZ_CRC_CE("UmbraViewVolumeService"));
     }
 
-    void UmbraViewVolumeComponentController::GetIncompatibleServices(AZ::ComponentDescriptor::DependencyArrayType& incompatible)
+    void UmbraViewVolumeComponentController::GetIncompatibleServices(AZ::ComponentDescriptor::DependencyArrayType& services)
     {
-        incompatible.push_back(AZ_CRC_CE("UmbraViewVolumeService"));
+        services.push_back(AZ_CRC_CE("UmbraObjectService"));
+        services.push_back(AZ_CRC_CE("UmbraSceneService"));
+        services.push_back(AZ_CRC_CE("UmbraViewVolumeService"));
     }
 
-    void UmbraViewVolumeComponentController::GetRequiredServices([[maybe_unused]] AZ::ComponentDescriptor::DependencyArrayType& required)
+    void UmbraViewVolumeComponentController::GetRequiredServices([[maybe_unused]] AZ::ComponentDescriptor::DependencyArrayType& services)
     {
+        services.push_back(AZ_CRC_CE("ShapeService"));
     }
 
     UmbraViewVolumeComponentController::UmbraViewVolumeComponentController(const UmbraViewVolumeComponentConfig& config)

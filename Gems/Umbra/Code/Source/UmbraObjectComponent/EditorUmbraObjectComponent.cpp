@@ -24,7 +24,7 @@ namespace Umbra
             if (auto editContext = serializeContext->GetEditContext())
             {
                 editContext->Class<EditorUmbraObjectComponent>(
-                    "UmbraObjectComponent", "")
+                    "Umbra Object", "")
                     ->ClassElement(AZ::Edit::ClassElements::EditorData, "")
                         ->Attribute(AZ::Edit::Attributes::Category, "Umbra")
                         ->Attribute(AZ::Edit::Attributes::Icon, "Icons/Components/Component_Placeholder.svg")
@@ -32,11 +32,18 @@ namespace Umbra
                         ->Attribute(AZ::Edit::Attributes::AppearsInAddComponentMenu, AZ_CRC_CE("Game"))
                         ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
                         ->Attribute(AZ::Edit::Attributes::HelpPageURL, "")
-                        ->Attribute(AZ::Edit::Attributes::PrimaryAssetType, AZ::AzTypeInfo<Umbra::UmbraTomeAsset>::Uuid())
+                    ;
+
+                editContext->Class<UmbraObjectComponentController>(
+                    "Umbra Object Component Controller", "")
+                    ->ClassElement(AZ::Edit::ClassElements::EditorData, "")
+                        ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
+                    ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraObjectComponentController::m_configuration, "Configuration", "")
+                        ->Attribute(AZ::Edit::Attributes::Visibility, AZ::Edit::PropertyVisibility::ShowChildrenOnly)
                     ;
 
                 editContext->Class<UmbraObjectComponentConfig>(
-                    "UmbraObjectComponentConfig", "")
+                    "Umbra Object Component Config", "")
                     ->ClassElement(AZ::Edit::ClassElements::EditorData, "")
                     ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
                     ->Attribute(AZ::Edit::Attributes::Visibility, AZ::Edit::PropertyVisibility::Hide)

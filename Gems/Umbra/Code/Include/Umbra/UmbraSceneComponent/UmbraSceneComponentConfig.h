@@ -5,9 +5,11 @@
 
 #pragma once
 
+#include <AzCore/Asset/AssetCommon.h>
 #include <AzCore/Component/Component.h>
 #include <AzCore/Memory/SystemAllocator.h>
 #include <AzCore/RTTI/RTTI.h>
+#include <Umbra/UmbraSceneAsset/UmbraSceneAsset.h>
 
 namespace AZ
 {
@@ -16,17 +18,18 @@ namespace AZ
 
 namespace Umbra
 {
-    //! UmbraViewVolumeComponent persistent configuration with settings for overriding same computation values within the volume. 
-    class UmbraViewVolumeComponentConfig final : public AZ::ComponentConfig
+    //! UmbraSceneComponent persistent configuration with settings for computing visibility data for the current scene. 
+    class UmbraSceneComponentConfig final : public AZ::ComponentConfig
     {
     public:
-        AZ_RTTI(UmbraViewVolumeComponentConfig, "{845FC090-884E-4EFF-B8F3-2D038BC49424}", AZ::ComponentConfig);
-        AZ_CLASS_ALLOCATOR(UmbraViewVolumeComponentConfig, AZ::SystemAllocator);
+        AZ_RTTI(UmbraSceneComponentConfig, "{C6384EFC-3691-4BF0-AD0F-E59C33BCE548}", AZ::ComponentConfig);
+        AZ_CLASS_ALLOCATOR(UmbraSceneComponentConfig, AZ::SystemAllocator);
 
         static void Reflect(AZ::ReflectContext* context);
 
         float m_collisionRadius = 0.125f;
         float m_smallestHole = 0.5f;
         float m_smallestOccluder = 3.f;
+        AZ::Data::Asset<UmbraSceneAsset> m_sceneAsset;
     };
 } // namespace Umbra

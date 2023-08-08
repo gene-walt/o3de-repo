@@ -12,7 +12,7 @@
 
 namespace Umbra
 {
-    //!
+    //! Managers editor only reflection of system level data types for the gem.
     class EditorUmbraSystemComponent final
         : public AzToolsFramework::Components::EditorComponentAdapter<UmbraSystemComponentController, UmbraSystemComponent, UmbraSystemComponentConfig>
         , public UmbraSystemComponentNotificationBus::Handler

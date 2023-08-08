@@ -9,14 +9,14 @@
 
 namespace Umbra
 {
-    //! UmbraSystemComponentRequestBus provides an interface to request operations on a UmbraSystemComponent
+    //! UmbraSystemComponentRequestBus provides an interface for UmbraSystemComponent
     class UmbraSystemComponentRequests : public AZ::ComponentBus
     {
     public:
     };
     using UmbraSystemComponentRequestBus = AZ::EBus<UmbraSystemComponentRequests>;
 
-    //! UmbraSystemComponentNotificationBus notifications are sent whenever the state of the UmbraSystemComponent changes.
+    //! UmbraSystemComponentNotificationBus notifications are sent when UmbraSystemComponent changes.
     class UmbraSystemComponentNotifications : public AZ::ComponentBus
     {
     public:

@@ -5,11 +5,10 @@
 
 #pragma once
 
+#include <AssetBuilderSDK/AssetBuilderBusses.h>
 #include <AzCore/Asset/AssetCommon.h>
 #include <AzCore/Asset/AssetManager.h>
 #include <AzCore/Component/Component.h>
-
-#include <AssetBuilderSDK/AssetBuilderBusses.h>
 
 namespace Umbra
 {
@@ -26,21 +25,22 @@ namespace Umbra
         return AZStd::move(assetWorker);
     }
 
-    class UmbraTomeAssetBuilderComponent final : public AZ::Component
+    //! Creates and registers an instance of the umbra scene asset builder
+    class UmbraSceneAssetBuilderComponent final : public AZ::Component
     {
     public:
-        AZ_COMPONENT(UmbraTomeAssetBuilderComponent, "{F1AF5754-51B2-46C3-A34B-70F02A63ACE5}");
+        AZ_COMPONENT(UmbraSceneAssetBuilderComponent, "{F1AF5754-51B2-46C3-A34B-70F02A63ACE5}");
         static void Reflect(AZ::ReflectContext* context);
 
-        UmbraTomeAssetBuilderComponent();
-        ~UmbraTomeAssetBuilderComponent() override;
+        UmbraSceneAssetBuilderComponent();
+        ~UmbraSceneAssetBuilderComponent() override;
 
         // AZ::Component overrides...
         void Activate() override;
         void Deactivate() override;
 
     private:
-        UmbraTomeAssetBuilderComponent(const UmbraTomeAssetBuilderComponent&) = delete;
+        UmbraSceneAssetBuilderComponent(const UmbraSceneAssetBuilderComponent&) = delete;
 
         using AssetWorker = AssetBuilderSDK::AssetBuilderCommandBus::Handler;
         AZStd::vector<AZStd::unique_ptr<AssetWorker>> m_assetWorkers;

@@ -5,9 +5,9 @@
 
 #pragma once
 
-#include <Umbra/UmbraTypeIds.h>
 #include <AzCore/EBus/EBus.h>
 #include <AzCore/Interface/Interface.h>
+#include <Umbra/UmbraTypeIds.h>
 
 namespace Umbra
 {
@@ -18,8 +18,7 @@ namespace Umbra
         virtual ~UmbraRequests() = default;
     };
 
-    class UmbraBusTraits
-        : public AZ::EBusTraits
+    class UmbraBusTraits : public AZ::EBusTraits
     {
     public:
         // EBusTraits overrides ...

@@ -6,11 +6,11 @@
 #include <Umbra/UmbraTypeIds.h>
 #include <UmbraModuleInterface.h>
 
-#include <UmbraLevelComponent/EditorUmbraLevelComponent.h>
 #include <UmbraObjectComponent/EditorUmbraObjectComponent.h>
+#include <UmbraSceneAsset/UmbraSceneAssetBuilderComponent.h>
+#include <UmbraSceneComponent/EditorUmbraSceneComponent.h>
 #include <UmbraSystemComponent/EditorUmbraSystemComponent.h>
 #include <UmbraViewVolumeComponent/EditorUmbraViewVolumeComponent.h>
-#include <UmbraTomeAsset/UmbraTomeAssetBuilderComponent.h>
 
 namespace Umbra
 {
@@ -26,11 +26,11 @@ namespace Umbra
             m_descriptors.insert(
                 m_descriptors.end(),
                 {
-                    UmbraTomeAssetBuilderComponent::CreateDescriptor(),
-                    EditorUmbraLevelComponent::CreateDescriptor(),
-                    EditorUmbraObjectComponent::CreateDescriptor(),
-                    EditorUmbraSystemComponent::CreateDescriptor(),
+                    UmbraSceneAssetBuilderComponent::CreateDescriptor(),
                     EditorUmbraViewVolumeComponent::CreateDescriptor(),
+                    EditorUmbraSystemComponent::CreateDescriptor(),
+                    EditorUmbraSceneComponent::CreateDescriptor(),
+                    EditorUmbraObjectComponent::CreateDescriptor(),
                 });
         }
 

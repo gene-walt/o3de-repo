@@ -24,7 +24,7 @@ namespace Umbra
             if (auto editContext = serializeContext->GetEditContext())
             {
                 editContext->Class<EditorUmbraViewVolumeComponent>(
-                    "UmbraViewVolumeComponent", "")
+                    "Umbra View Volume", "")
                     ->ClassElement(AZ::Edit::ClassElements::EditorData, "")
                         ->Attribute(AZ::Edit::Attributes::Category, "Umbra")
                         ->Attribute(AZ::Edit::Attributes::Icon, "Icons/Components/Component_Placeholder.svg")
@@ -32,14 +32,24 @@ namespace Umbra
                         ->Attribute(AZ::Edit::Attributes::AppearsInAddComponentMenu, AZ_CRC_CE("Game"))
                         ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
                         ->Attribute(AZ::Edit::Attributes::HelpPageURL, "")
-                        ->Attribute(AZ::Edit::Attributes::PrimaryAssetType, AZ::AzTypeInfo<Umbra::UmbraTomeAsset>::Uuid())
+                    ;
+
+                editContext->Class<UmbraViewVolumeComponentController>(
+                    "Umbra View Volume Component Controller", "")
+                    ->ClassElement(AZ::Edit::ClassElements::EditorData, "")
+                        ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
+                    ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraViewVolumeComponentController::m_configuration, "Configuration", "")
+                        ->Attribute(AZ::Edit::Attributes::Visibility, AZ::Edit::PropertyVisibility::ShowChildrenOnly)
                     ;
 
                 editContext->Class<UmbraViewVolumeComponentConfig>(
-                    "UmbraViewVolumeComponentConfig", "")
+                    "Umbra View Volume Component Config", "")
                     ->ClassElement(AZ::Edit::ClassElements::EditorData, "")
                     ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
                     ->Attribute(AZ::Edit::Attributes::Visibility, AZ::Edit::PropertyVisibility::Hide)
+                    ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraViewVolumeComponentConfig::m_collisionRadius, "Collision Radius", "")
+                    ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraViewVolumeComponentConfig::m_smallestHole, "Smallest Hole", "")
+                    ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraViewVolumeComponentConfig::m_smallestOccluder, "Smallest Occluder", "")
                     ;
             }
         }

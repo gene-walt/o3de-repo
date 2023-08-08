@@ -11,7 +11,7 @@
 
 namespace Umbra
 {
-    //!
+    //! UmbraObjectComponent can be added to entities with compatible renderable components to configure umbra occlusion settings.
     class UmbraObjectComponent final
         : public AzFramework::Components::ComponentAdapter<UmbraObjectComponentController, UmbraObjectComponentConfig>
     {

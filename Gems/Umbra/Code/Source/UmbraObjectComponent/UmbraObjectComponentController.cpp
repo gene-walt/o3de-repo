@@ -31,17 +31,19 @@ namespace Umbra
         }
     }
 
-    void UmbraObjectComponentController::GetProvidedServices(AZ::ComponentDescriptor::DependencyArrayType& provided)
+    void UmbraObjectComponentController::GetProvidedServices(AZ::ComponentDescriptor::DependencyArrayType& services)
     {
-        provided.push_back(AZ_CRC_CE("UmbraObjectService"));
+        services.push_back(AZ_CRC_CE("UmbraObjectService"));
     }
 
-    void UmbraObjectComponentController::GetIncompatibleServices(AZ::ComponentDescriptor::DependencyArrayType& incompatible)
+    void UmbraObjectComponentController::GetIncompatibleServices(AZ::ComponentDescriptor::DependencyArrayType& services)
     {
-        incompatible.push_back(AZ_CRC_CE("UmbraObjectService"));
+        services.push_back(AZ_CRC_CE("UmbraObjectService"));
+        services.push_back(AZ_CRC_CE("UmbraSceneService"));
+        services.push_back(AZ_CRC_CE("UmbraViewVolumeService"));
     }
 
-    void UmbraObjectComponentController::GetRequiredServices([[maybe_unused]] AZ::ComponentDescriptor::DependencyArrayType& required)
+    void UmbraObjectComponentController::GetRequiredServices([[maybe_unused]] AZ::ComponentDescriptor::DependencyArrayType& services)
     {
     }
 

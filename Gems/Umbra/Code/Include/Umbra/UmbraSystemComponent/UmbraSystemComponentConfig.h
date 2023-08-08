@@ -9,7 +9,7 @@
 
 namespace Umbra
 {
-    //! Common configuration for UmbraSystemComponent
+    //! UmbraSystemComponent persistent configuration
     class UmbraSystemComponentConfig final : public AZ::ComponentConfig
     {
     public:

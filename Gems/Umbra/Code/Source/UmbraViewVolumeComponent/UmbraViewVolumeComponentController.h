@@ -11,7 +11,8 @@
 
 namespace Umbra
 {
-    //!
+    //! Manages any common functionality between runtime and editor components for umbra view volumes. This may be responsible for rendering
+    //! debug data.
     class UmbraViewVolumeComponentController final : UmbraViewVolumeComponentRequestBus::Handler
     {
     public:
@@ -21,9 +22,9 @@ namespace Umbra
         AZ_RTTI(UmbraViewVolumeComponentController, "{EF925CDB-C496-403B-9F2F-2D0FC6B7BCC2}");
 
         static void Reflect(AZ::ReflectContext* context);
-        static void GetProvidedServices(AZ::ComponentDescriptor::DependencyArrayType& provided);
-        static void GetIncompatibleServices(AZ::ComponentDescriptor::DependencyArrayType& incompatible);
-        static void GetRequiredServices(AZ::ComponentDescriptor::DependencyArrayType& required);
+        static void GetProvidedServices(AZ::ComponentDescriptor::DependencyArrayType& services);
+        static void GetIncompatibleServices(AZ::ComponentDescriptor::DependencyArrayType& services);
+        static void GetRequiredServices(AZ::ComponentDescriptor::DependencyArrayType& services);
 
         UmbraViewVolumeComponentController() = default;
         UmbraViewVolumeComponentController(const UmbraViewVolumeComponentConfig& config);

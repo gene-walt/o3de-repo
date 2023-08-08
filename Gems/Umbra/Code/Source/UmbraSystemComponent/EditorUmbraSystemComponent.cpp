@@ -8,12 +8,14 @@
 #include <AzToolsFramework/API/ToolsApplicationAPI.h>
 #include <UmbraSystemComponent/EditorUmbraSystemComponent.h>
 #include <UmbraSystemComponent/EditorUmbraSystemComponentUtil.h>
+#include <UmbraSceneAsset/UmbraSceneDescriptor.h>
 
 namespace Umbra
 {
     void EditorUmbraSystemComponent::Reflect(AZ::ReflectContext* context)
     {
         BaseClass::Reflect(context);
+        UmbraSceneDescriptor::Reflect(context);
 
         if (auto serializeContext = azrtti_cast<AZ::SerializeContext*>(context))
         {
@@ -24,7 +26,7 @@ namespace Umbra
             if (auto editContext = serializeContext->GetEditContext())
             {
                 editContext->Class<EditorUmbraSystemComponent>(
-                    "UmbraSystemComponent", "")
+                    "Umbra System", "")
                     ->ClassElement(AZ::Edit::ClassElements::EditorData, "")
                         ->Attribute(AZ::Edit::Attributes::Category, "Umbra")
                         ->Attribute(AZ::Edit::Attributes::Icon, "Icons/Components/Component_Placeholder.svg")
@@ -32,11 +34,19 @@ namespace Umbra
                         ->Attribute(AZ::Edit::Attributes::AppearsInAddComponentMenu, AZ_CRC_CE("System"))
                         ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
                         ->Attribute(AZ::Edit::Attributes::HelpPageURL, "")
-                        ->Attribute(AZ::Edit::Attributes::PrimaryAssetType, AZ::AzTypeInfo<Umbra::UmbraTomeAsset>::Uuid())
+                        ->Attribute(AZ::Edit::Attributes::PrimaryAssetType, AZ::AzTypeInfo<Umbra::UmbraSceneAsset>::Uuid())
+                    ;
+
+                editContext->Class<UmbraSystemComponentController>(
+                    "Umbra System Component Controller", "")
+                    ->ClassElement(AZ::Edit::ClassElements::EditorData, "")
+                        ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
+                    ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraSystemComponentController::m_configuration, "Configuration", "")
+                        ->Attribute(AZ::Edit::Attributes::Visibility, AZ::Edit::PropertyVisibility::ShowChildrenOnly)
                     ;
 
                 editContext->Class<UmbraSystemComponentConfig>(
-                    "UmbraSystemComponentConfig", "")
+                    "Umbra System Component Config", "")
                     ->ClassElement(AZ::Edit::ClassElements::EditorData, "")
                     ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
                     ->Attribute(AZ::Edit::Attributes::Visibility, AZ::Edit::PropertyVisibility::Hide)

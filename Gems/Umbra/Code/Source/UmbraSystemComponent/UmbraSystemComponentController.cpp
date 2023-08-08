@@ -3,16 +3,15 @@
  * its licensors.
  */
 
+#include <AzCore/Asset/AssetManager.h>
 #include <AzCore/RTTI/BehaviorContext.h>
 #include <AzCore/Serialization/SerializeContext.h>
-#include <Umbra/UmbraTomeAsset/UmbraTomeAsset.h>
 #include <UmbraSystemComponent/UmbraSystemComponentController.h>
 
 namespace Umbra
 {
     void UmbraSystemComponentController::Reflect(AZ::ReflectContext* context)
     {
-        UmbraTomeAsset::Reflect(context);
         UmbraSystemComponentConfig::Reflect(context);
 
         if (auto serializeContext = azrtti_cast<AZ::SerializeContext*>(context))
@@ -33,17 +32,17 @@ namespace Umbra
         }
     }
 
-    void UmbraSystemComponentController::GetProvidedServices(AZ::ComponentDescriptor::DependencyArrayType& provided)
+    void UmbraSystemComponentController::GetProvidedServices(AZ::ComponentDescriptor::DependencyArrayType& services)
     {
-        provided.push_back(AZ_CRC_CE("UmbraSystemService"));
+        services.push_back(AZ_CRC_CE("UmbraSystemService"));
     }
 
-    void UmbraSystemComponentController::GetIncompatibleServices(AZ::ComponentDescriptor::DependencyArrayType& incompatible)
+    void UmbraSystemComponentController::GetIncompatibleServices(AZ::ComponentDescriptor::DependencyArrayType& services)
     {
-        incompatible.push_back(AZ_CRC_CE("UmbraSystemService"));
+        services.push_back(AZ_CRC_CE("UmbraSystemService"));
     }
 
-    void UmbraSystemComponentController::GetRequiredServices([[maybe_unused]] AZ::ComponentDescriptor::DependencyArrayType& required)
+    void UmbraSystemComponentController::GetRequiredServices([[maybe_unused]] AZ::ComponentDescriptor::DependencyArrayType& services)
     {
     }
 
@@ -55,23 +54,17 @@ namespace Umbra
     void UmbraSystemComponentController::Activate(AZ::EntityId entityId)
     {
         m_entityId = entityId;
-        m_tomeAssetHandler.reset(aznew UmbraTomeAssetHandler(UmbraTomeAsset::DisplayName, UmbraTomeAsset::Group, UmbraTomeAsset::Extension));
-        m_tomeAssetHandler->Register();
+        m_sceneAssetHandler.reset(aznew UmbraSceneAssetHandler(UmbraSceneAsset::DisplayName, UmbraSceneAsset::Group, UmbraSceneAsset::Extension));
+        m_sceneAssetHandler->Register();
 
         UmbraSystemComponentRequestBus::Handler::BusConnect(m_entityId);
-        QueueTome();
     }
 
     void UmbraSystemComponentController::Deactivate()
     {
-        AZ::Data::AssetBus::Handler::BusDisconnect();
         UmbraSystemComponentRequestBus::Handler::BusDisconnect();
-
-        ReleaseTome();
-
-        m_tomeAsset.Release();
-        m_tomeAssetHandler->Unregister();
-        m_tomeAssetHandler.reset();
+        m_sceneAssetHandler->Unregister();
+        m_sceneAssetHandler.reset();
         m_entityId = AZ::EntityId(AZ::EntityId::InvalidEntityId);
     }
 
@@ -83,58 +76,5 @@ namespace Umbra
     const UmbraSystemComponentConfig& UmbraSystemComponentController::GetConfiguration() const
     {
         return m_configuration;
-    }
-
-    void UmbraSystemComponentController::OnAssetReady(AZ::Data::Asset<AZ::Data::AssetData> asset)
-    {
-        m_tomeAsset = asset;
-        CreateTome();
-    }
-
-    void UmbraSystemComponentController::OnAssetReloaded(AZ::Data::Asset<AZ::Data::AssetData> asset)
-    {
-        m_tomeAsset = asset;
-        CreateTome();
-    }
-
-    void UmbraSystemComponentController::OnAssetError(AZ::Data::Asset<AZ::Data::AssetData> asset)
-    {
-    }
-
-    void UmbraSystemComponentController::OnAssetReloadError(AZ::Data::Asset<AZ::Data::AssetData> asset)
-    {
-    }
-
-    void UmbraSystemComponentController::QueueTome()
-    {
-        ReleaseTome();
-
-        AZ::Data::AssetBus::Handler::BusDisconnect();
-
-        if (m_tomeAsset.GetId().IsValid())
-        {
-            m_tomeAsset.QueueLoad();
-            AZ::Data::AssetBus::Handler::BusConnect(m_tomeAsset.GetId());
-        }
-    }
-
-    void UmbraSystemComponentController::CreateTome()
-    {
-        ReleaseTome();
-
-        if (m_tomeAsset.IsReady())
-        {
-            const auto& tomeBuffer = m_tomeAsset->GetTomeBuffer();
-            m_tome = Umbra::TomeLoader::loadFromBuffer(tomeBuffer.data(), tomeBuffer.size());
-        }
-    }
-
-    void UmbraSystemComponentController::ReleaseTome()
-    {
-        if (m_tome)
-        {
-            Umbra::TomeLoader::freeTome(m_tome);
-            m_tome = nullptr;
-        }
     }
 } // namespace Umbra

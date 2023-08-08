@@ -5,6 +5,8 @@
 
 #include <AzCore/RTTI/BehaviorContext.h>
 #include <AzCore/Serialization/SerializeContext.h>
+#include <Umbra/UmbraSceneAsset/UmbraObjectDescriptor.h>
+#include <Umbra/UmbraSceneAsset/UmbraSceneAsset.h>
 #include <UmbraSystemComponent/UmbraSystemComponent.h>
 
 namespace Umbra
@@ -17,6 +19,8 @@ namespace Umbra
     void UmbraSystemComponent::Reflect(AZ::ReflectContext* context)
     {
         BaseClass::Reflect(context);
+        UmbraObjectDescriptor::Reflect(context);
+        UmbraSceneAsset::Reflect(context);
 
         if (auto serializeContext = azrtti_cast<AZ::SerializeContext*>(context))
         {

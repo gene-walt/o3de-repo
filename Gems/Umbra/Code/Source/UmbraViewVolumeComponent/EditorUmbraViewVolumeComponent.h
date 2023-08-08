@@ -12,7 +12,7 @@
 
 namespace Umbra
 {
-    //!
+    //! Reflects edit contacts and other editor specific data for corresponding component and controller.
     class EditorUmbraViewVolumeComponent final
         : public AzToolsFramework::Components::EditorComponentAdapter<UmbraViewVolumeComponentController, UmbraViewVolumeComponent, UmbraViewVolumeComponentConfig>
         , public UmbraViewVolumeComponentNotificationBus::Handler

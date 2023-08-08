@@ -7,8 +7,8 @@
 #include <Umbra/UmbraTypeIds.h>
 #include <UmbraModuleInterface.h>
 
-#include <UmbraLevelComponent/UmbraLevelComponent.h>
 #include <UmbraObjectComponent/UmbraObjectComponent.h>
+#include <UmbraSceneComponent/UmbraSceneComponent.h>
 #include <UmbraSystemComponent/UmbraSystemComponent.h>
 #include <UmbraViewVolumeComponent/UmbraViewVolumeComponent.h>
 
@@ -24,8 +24,8 @@ namespace Umbra
         m_descriptors.insert(
             m_descriptors.end(),
             {
-                UmbraLevelComponent::CreateDescriptor(),
                 UmbraObjectComponent::CreateDescriptor(),
+                UmbraSceneComponent::CreateDescriptor(),
                 UmbraSystemComponent::CreateDescriptor(),
                 UmbraViewVolumeComponent::CreateDescriptor(),
             });

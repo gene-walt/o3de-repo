@@ -5,29 +5,29 @@
 
 #include <AzCore/RTTI/BehaviorContext.h>
 #include <AzCore/Serialization/SerializeContext.h>
-#include <UmbraLevelComponent/UmbraLevelComponent.h>
+#include <UmbraSceneComponent/UmbraSceneComponent.h>
 
 namespace Umbra
 {
-    UmbraLevelComponent::UmbraLevelComponent(const UmbraLevelComponentConfig& config)
+    UmbraSceneComponent::UmbraSceneComponent(const UmbraSceneComponentConfig& config)
         : BaseClass(config)
     {
     }
 
-    void UmbraLevelComponent::Reflect(AZ::ReflectContext* context)
+    void UmbraSceneComponent::Reflect(AZ::ReflectContext* context)
     {
         BaseClass::Reflect(context);
 
         if (auto serializeContext = azrtti_cast<AZ::SerializeContext*>(context))
         {
-            serializeContext->Class<UmbraLevelComponent, BaseClass>()
+            serializeContext->Class<UmbraSceneComponent, BaseClass>()
                 ->Version(0)
                 ;
         }
 
         if (auto behaviorContext = azrtti_cast<AZ::BehaviorContext*>(context))
         {
-            behaviorContext->ConstantProperty("UmbraLevelComponentTypeId", BehaviorConstant(AZ::Uuid(UmbraLevelComponentTypeId)))
+            behaviorContext->ConstantProperty("UmbraSceneComponentTypeId", BehaviorConstant(AZ::Uuid(UmbraSceneComponentTypeId)))
                 ->Attribute(AZ::Script::Attributes::Module, "umbra")
                 ->Attribute(AZ::Script::Attributes::Scope, AZ::Script::Attributes::ScopeFlags::Common)
                 ;

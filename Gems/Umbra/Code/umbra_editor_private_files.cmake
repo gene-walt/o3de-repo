@@ -4,14 +4,20 @@
 #
 
 set(FILES
-    Source/UmbraLevelComponent/EditorUmbraLevelComponent.cpp
-    Source/UmbraLevelComponent/EditorUmbraLevelComponent.h
-    Source/UmbraLevelComponent/EditorUmbraLevelComponentUtil.cpp
-    Source/UmbraLevelComponent/EditorUmbraLevelComponentUtil.h
     Source/UmbraObjectComponent/EditorUmbraObjectComponent.cpp
     Source/UmbraObjectComponent/EditorUmbraObjectComponent.h
     Source/UmbraObjectComponent/EditorUmbraObjectComponentUtil.cpp
     Source/UmbraObjectComponent/EditorUmbraObjectComponentUtil.h
+    Source/UmbraSceneAsset/UmbraSceneAssetBuilder.cpp
+    Source/UmbraSceneAsset/UmbraSceneAssetBuilder.h
+    Source/UmbraSceneAsset/UmbraSceneAssetBuilderComponent.cpp
+    Source/UmbraSceneAsset/UmbraSceneAssetBuilderComponent.h
+    Source/UmbraSceneAsset/UmbraSceneDescriptor.cpp
+    Source/UmbraSceneAsset/UmbraSceneDescriptor.h
+    Source/UmbraSceneComponent/EditorUmbraSceneComponent.cpp
+    Source/UmbraSceneComponent/EditorUmbraSceneComponent.h
+    Source/UmbraSceneComponent/EditorUmbraSceneComponentUtil.cpp
+    Source/UmbraSceneComponent/EditorUmbraSceneComponentUtil.h
     Source/UmbraSystemComponent/EditorUmbraSystemComponent.cpp
     Source/UmbraSystemComponent/EditorUmbraSystemComponent.h
     Source/UmbraSystemComponent/EditorUmbraSystemComponentUtil.cpp
@@ -20,8 +26,4 @@ set(FILES
     Source/UmbraViewVolumeComponent/EditorUmbraViewVolumeComponent.h
     Source/UmbraViewVolumeComponent/EditorUmbraViewVolumeComponentUtil.cpp
     Source/UmbraViewVolumeComponent/EditorUmbraViewVolumeComponentUtil.h
-    Source/UmbraTomeAsset/UmbraTomeAssetBuilder.cpp
-    Source/UmbraTomeAsset/UmbraTomeAssetBuilder.h
-    Source/UmbraTomeAsset/UmbraTomeAssetBuilderComponent.cpp
-    Source/UmbraTomeAsset/UmbraTomeAssetBuilderComponent.h
 )

@@ -11,7 +11,7 @@
 
 namespace Umbra
 {
-    //!
+    //! Implements common functionality for umbra object run time and editor components.
     class UmbraObjectComponentController final : UmbraObjectComponentRequestBus::Handler
     {
     public:
@@ -21,9 +21,9 @@ namespace Umbra
         AZ_RTTI(UmbraObjectComponentController, "{71E651D8-48F3-4605-8A68-F21E71DF49FD}");
 
         static void Reflect(AZ::ReflectContext* context);
-        static void GetProvidedServices(AZ::ComponentDescriptor::DependencyArrayType& provided);
-        static void GetIncompatibleServices(AZ::ComponentDescriptor::DependencyArrayType& incompatible);
-        static void GetRequiredServices(AZ::ComponentDescriptor::DependencyArrayType& required);
+        static void GetProvidedServices(AZ::ComponentDescriptor::DependencyArrayType& services);
+        static void GetIncompatibleServices(AZ::ComponentDescriptor::DependencyArrayType& services);
+        static void GetRequiredServices(AZ::ComponentDescriptor::DependencyArrayType& services);
 
         UmbraObjectComponentController() = default;
         UmbraObjectComponentController(const UmbraObjectComponentConfig& config);

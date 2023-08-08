@@ -15,6 +15,9 @@ namespace Umbra
         {
             serializeContext->Class<UmbraViewVolumeComponentConfig, AZ::ComponentConfig>()
                 ->Version(0)
+                ->Field("collisionRadius", &UmbraViewVolumeComponentConfig::m_collisionRadius)
+                ->Field("smallestHole", &UmbraViewVolumeComponentConfig::m_smallestHole)
+                ->Field("smallestOccluder", &UmbraViewVolumeComponentConfig::m_smallestOccluder)
                 ;
         }
 

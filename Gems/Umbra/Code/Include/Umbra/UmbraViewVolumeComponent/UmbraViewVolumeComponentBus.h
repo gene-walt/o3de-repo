@@ -9,14 +9,14 @@
 
 namespace Umbra
 {
-    //! UmbraViewVolumeComponentRequestBus provides an interface to request operations on a UmbraViewVolumeComponent
+    //! UmbraViewVolumeComponentRequestBus provides an interface for UmbraViewVolumeComponent
     class UmbraViewVolumeComponentRequests : public AZ::ComponentBus
     {
     public:
     };
     using UmbraViewVolumeComponentRequestBus = AZ::EBus<UmbraViewVolumeComponentRequests>;
 
-    //! UmbraViewVolumeComponentNotificationBus notifications are sent whenever the state of the UmbraViewVolumeComponent changes.
+    //! UmbraViewVolumeComponentNotificationBus notifications are sent when UmbraViewVolumeComponent changes.
     class UmbraViewVolumeComponentNotifications : public AZ::ComponentBus
     {
     public:
