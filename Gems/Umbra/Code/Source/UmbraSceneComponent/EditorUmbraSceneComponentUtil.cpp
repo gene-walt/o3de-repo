@@ -52,7 +52,7 @@ namespace Umbra
                 //    });
 
                 AzFramework::VisibleGeometryContainer geometryContainer;
-                handler->GetVisibleGeometry(geometryContainer);
+                handler->GetVisibleGeometry(AZ::Aabb::CreateNull(), geometryContainer);
 
                 uint32_t partId = 0;
                 for (const auto& geometry : geometryContainer)
