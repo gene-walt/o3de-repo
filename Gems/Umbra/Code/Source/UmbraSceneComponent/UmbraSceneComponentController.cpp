@@ -6,11 +6,12 @@
 #include <AzCore/Math/Matrix4x4.h>
 #include <AzCore/Math/Vector3.h>
 #include <AzCore/RTTI/BehaviorContext.h>
+#include <AzCore/Serialization/EditContext.h>
 #include <AzCore/Serialization/SerializeContext.h>
-#include <UmbraSceneComponent/UmbraSceneComponentController.h>
 #include <AzFramework/Visibility/BoundsBus.h>
+#include <UmbraSceneComponent/UmbraSceneComponentController.h>
 
-    namespace Umbra
+namespace Umbra
 {
     void UmbraSceneComponentController::Reflect(AZ::ReflectContext* context)
     {
@@ -22,6 +23,16 @@
                 ->Version(0)
                 ->Field("Configuration", &UmbraSceneComponentController::m_configuration)
                 ;
+
+            if (auto editContext = serializeContext->GetEditContext())
+            {
+                editContext->Class<UmbraSceneComponentController>("UmbraSceneComponentController", "")
+                    ->ClassElement(AZ::Edit::ClassElements::EditorData, "")
+                    ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
+                    ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraSceneComponentController::m_configuration, "Configuration", "")
+                    ->Attribute(AZ::Edit::Attributes::Visibility, AZ::Edit::PropertyVisibility::ShowChildrenOnly)
+                    ;
+            }
         }
 
         if (auto behaviorContext = azrtti_cast<AZ::BehaviorContext*>(context))

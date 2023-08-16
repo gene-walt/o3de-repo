@@ -8,8 +8,6 @@
 #include <AzCore/Component/EntityId.h>
 #include <AzCore/Memory/SystemAllocator.h>
 #include <AzCore/RTTI/RTTI.h>
-#include <AzCore/std/containers/vector.h>
-#include <AzCore/std/string/string.h>
 
 namespace AZ
 {

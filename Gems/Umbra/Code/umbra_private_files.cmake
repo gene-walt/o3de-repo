@@ -13,6 +13,7 @@ set(FILES
     Source/UmbraObjectComponent/UmbraObjectComponentController.h
     Source/UmbraSceneAsset/UmbraObjectDescriptor.cpp
     Source/UmbraSceneAsset/UmbraSceneAsset.cpp
+    Source/UmbraSceneAsset/UmbraSceneSettings.cpp
     Source/UmbraSceneComponent/UmbraSceneComponent.cpp
     Source/UmbraSceneComponent/UmbraSceneComponent.h
     Source/UmbraSceneComponent/UmbraSceneComponentConfig.cpp

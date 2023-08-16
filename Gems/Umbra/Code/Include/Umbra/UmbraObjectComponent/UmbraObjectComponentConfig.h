@@ -17,5 +17,8 @@ namespace Umbra
         AZ_CLASS_ALLOCATOR(UmbraObjectComponentConfig, AZ::SystemAllocator);
 
         static void Reflect(AZ::ReflectContext* context);
+
+        bool m_canOcclude = true;
+        bool m_canBeOccluded = true;
     };
 } // namespace Umbra

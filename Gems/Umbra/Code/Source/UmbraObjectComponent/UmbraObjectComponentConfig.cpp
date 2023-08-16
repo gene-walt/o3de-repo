@@ -4,6 +4,7 @@
  */
 
 #include <AzCore/RTTI/BehaviorContext.h>
+#include <AzCore/Serialization/EditContext.h>
 #include <AzCore/Serialization/SerializeContext.h>
 #include <Umbra/UmbraObjectComponent/UmbraObjectComponentConfig.h>
 
@@ -15,7 +16,21 @@ namespace Umbra
         {
             serializeContext->Class<UmbraObjectComponentConfig, AZ::ComponentConfig>()
                 ->Version(0)
+                ->Field("canOcclude", &UmbraObjectComponentConfig::m_canOcclude)
+                ->Field("canBeOccluded", &UmbraObjectComponentConfig::m_canBeOccluded)
                 ;
+
+            if (auto editContext = serializeContext->GetEditContext())
+            {
+                editContext->Class<UmbraObjectComponentConfig>("UmbraObjectComponentConfig", "")
+                    ->ClassElement(AZ::Edit::ClassElements::EditorData, "")
+                    ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
+                    ->Attribute(AZ::Edit::Attributes::Visibility, AZ::Edit::PropertyVisibility::Show)
+                    ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraObjectComponentConfig::m_canOcclude, "Can Occlude", "")
+                    ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraObjectComponentConfig::m_canBeOccluded, "Can Be Occluded", "")
+                    ;
+                ;
+            }
         }
 
         if (auto behaviorContext = azrtti_cast<AZ::BehaviorContext*>(context))
@@ -26,6 +41,8 @@ namespace Umbra
                 ->Attribute(AZ::Script::Attributes::Module, "umbra")
                 ->Constructor()
                 ->Constructor<const UmbraObjectComponentConfig&>()
+                ->Property("canOcclude", BehaviorValueProperty(&UmbraObjectComponentConfig::m_canOcclude))
+                ->Property("canBeOccluded", BehaviorValueProperty(&UmbraObjectComponentConfig::m_canBeOccluded))
                 ;
         }
     }

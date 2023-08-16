@@ -4,11 +4,11 @@
  */
 
 #include <AzCore/RTTI/BehaviorContext.h>
+#include <AzCore/Serialization/EditContext.h>
 #include <AzCore/Serialization/SerializeContext.h>
 #include <AzToolsFramework/API/ToolsApplicationAPI.h>
-#include <UmbraSystemComponent/EditorUmbraSystemComponent.h>
-#include <UmbraSystemComponent/EditorUmbraSystemComponentUtil.h>
 #include <UmbraSceneAsset/UmbraSceneDescriptor.h>
+#include <UmbraSystemComponent/EditorUmbraSystemComponent.h>
 
 namespace Umbra
 {
@@ -35,21 +35,6 @@ namespace Umbra
                         ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
                         ->Attribute(AZ::Edit::Attributes::HelpPageURL, "")
                         ->Attribute(AZ::Edit::Attributes::PrimaryAssetType, AZ::AzTypeInfo<Umbra::UmbraSceneAsset>::Uuid())
-                    ;
-
-                editContext->Class<UmbraSystemComponentController>(
-                    "Umbra System Component Controller", "")
-                    ->ClassElement(AZ::Edit::ClassElements::EditorData, "")
-                        ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
-                    ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraSystemComponentController::m_configuration, "Configuration", "")
-                        ->Attribute(AZ::Edit::Attributes::Visibility, AZ::Edit::PropertyVisibility::ShowChildrenOnly)
-                    ;
-
-                editContext->Class<UmbraSystemComponentConfig>(
-                    "Umbra System Component Config", "")
-                    ->ClassElement(AZ::Edit::ClassElements::EditorData, "")
-                    ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
-                    ->Attribute(AZ::Edit::Attributes::Visibility, AZ::Edit::PropertyVisibility::Hide)
                     ;
             }
         }

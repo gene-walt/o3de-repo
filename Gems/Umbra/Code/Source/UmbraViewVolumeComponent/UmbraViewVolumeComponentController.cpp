@@ -4,6 +4,7 @@
  */
 
 #include <AzCore/RTTI/BehaviorContext.h>
+#include <AzCore/Serialization/EditContext.h>
 #include <AzCore/Serialization/SerializeContext.h>
 #include <UmbraViewVolumeComponent/UmbraViewVolumeComponentController.h>
 
@@ -19,6 +20,16 @@ namespace Umbra
                 ->Version(0)
                 ->Field("Configuration", &UmbraViewVolumeComponentController::m_configuration)
                 ;
+
+            if (auto editContext = serializeContext->GetEditContext())
+            {
+                editContext->Class<UmbraViewVolumeComponentController>("UmbraViewVolumeComponentController", "")
+                    ->ClassElement(AZ::Edit::ClassElements::EditorData, "")
+                    ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
+                    ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraViewVolumeComponentController::m_configuration, "Configuration", "")
+                    ->Attribute(AZ::Edit::Attributes::Visibility, AZ::Edit::PropertyVisibility::ShowChildrenOnly)
+                    ;
+            }
         }
 
         if (auto behaviorContext = azrtti_cast<AZ::BehaviorContext*>(context))
@@ -73,5 +84,25 @@ namespace Umbra
     const UmbraViewVolumeComponentConfig& UmbraViewVolumeComponentController::GetConfiguration() const
     {
         return m_configuration;
+    }
+
+    void UmbraViewVolumeComponentController::SetOverrideSceneSettings(bool overrideSceneSettings)
+    {
+        m_configuration.m_overrideSceneSettings = overrideSceneSettings;
+    }
+
+    bool UmbraViewVolumeComponentController::GetOverrideSceneSettings() const
+    {
+        return m_configuration.m_overrideSceneSettings;
+    }
+
+    void UmbraViewVolumeComponentController::SetSceneSettings(const UmbraSceneSettings& sceneSettings)
+    {
+        m_configuration.m_sceneSettings = sceneSettings;
+    }
+
+    const UmbraSceneSettings& UmbraViewVolumeComponentController::GetSceneSettings() const
+    {
+        return m_configuration.m_sceneSettings;
     }
 } // namespace Umbra

@@ -4,10 +4,10 @@
  */
 
 #include <AzCore/RTTI/BehaviorContext.h>
+#include <AzCore/Serialization/EditContext.h>
 #include <AzCore/Serialization/SerializeContext.h>
 #include <AzToolsFramework/API/ToolsApplicationAPI.h>
 #include <UmbraObjectComponent/EditorUmbraObjectComponent.h>
-#include <UmbraObjectComponent/EditorUmbraObjectComponentUtil.h>
 
 namespace Umbra
 {
@@ -32,21 +32,6 @@ namespace Umbra
                         ->Attribute(AZ::Edit::Attributes::AppearsInAddComponentMenu, AZ_CRC_CE("Game"))
                         ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
                         ->Attribute(AZ::Edit::Attributes::HelpPageURL, "")
-                    ;
-
-                editContext->Class<UmbraObjectComponentController>(
-                    "Umbra Object Component Controller", "")
-                    ->ClassElement(AZ::Edit::ClassElements::EditorData, "")
-                        ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
-                    ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraObjectComponentController::m_configuration, "Configuration", "")
-                        ->Attribute(AZ::Edit::Attributes::Visibility, AZ::Edit::PropertyVisibility::ShowChildrenOnly)
-                    ;
-
-                editContext->Class<UmbraObjectComponentConfig>(
-                    "Umbra Object Component Config", "")
-                    ->ClassElement(AZ::Edit::ClassElements::EditorData, "")
-                    ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
-                    ->Attribute(AZ::Edit::Attributes::Visibility, AZ::Edit::PropertyVisibility::Hide)
                     ;
             }
         }

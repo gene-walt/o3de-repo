@@ -8,6 +8,7 @@
 #include <Umbra/UmbraSceneAsset/UmbraObjectDescriptor.h>
 #include <Umbra/UmbraSceneAsset/UmbraSceneAsset.h>
 #include <UmbraSystemComponent/UmbraSystemComponent.h>
+#include <Umbra/UmbraSceneAsset/UmbraSceneSettings.h>
 
 namespace Umbra
 {
@@ -21,6 +22,7 @@ namespace Umbra
         BaseClass::Reflect(context);
         UmbraObjectDescriptor::Reflect(context);
         UmbraSceneAsset::Reflect(context);
+        UmbraSceneSettings::Reflect(context);
 
         if (auto serializeContext = azrtti_cast<AZ::SerializeContext*>(context))
         {

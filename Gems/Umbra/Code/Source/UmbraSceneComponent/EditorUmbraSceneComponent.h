@@ -34,6 +34,8 @@ namespace Umbra
 
         AZ::u32 GenerateUmbraScene();
 
+        bool GenerateUmbraSceneFromLevel(const AZStd::string& scenePath) const;
+
         static constexpr const char* GenerateUmbraSceneButtonText = "Generate Umbra Scene...";
         static constexpr const char* GenerateUmbraSceneToolTipText = "Generate and save an umbra scene from level entities.";
     };

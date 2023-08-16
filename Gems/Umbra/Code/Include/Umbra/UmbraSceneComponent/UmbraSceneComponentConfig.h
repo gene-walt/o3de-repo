@@ -10,6 +10,7 @@
 #include <AzCore/Memory/SystemAllocator.h>
 #include <AzCore/RTTI/RTTI.h>
 #include <Umbra/UmbraSceneAsset/UmbraSceneAsset.h>
+#include <Umbra/UmbraSceneAsset/UmbraSceneSettings.h>
 
 namespace AZ
 {
@@ -24,12 +25,10 @@ namespace Umbra
     public:
         AZ_RTTI(UmbraSceneComponentConfig, "{C6384EFC-3691-4BF0-AD0F-E59C33BCE548}", AZ::ComponentConfig);
         AZ_CLASS_ALLOCATOR(UmbraSceneComponentConfig, AZ::SystemAllocator);
-
         static void Reflect(AZ::ReflectContext* context);
 
-        float m_collisionRadius = 0.125f;
-        float m_smallestHole = 0.5f;
-        float m_smallestOccluder = 3.f;
+        UmbraSceneSettings m_sceneSettings;
         AZ::Data::Asset<UmbraSceneAsset> m_sceneAsset;
+        bool m_onlyStaticObjects = true;
     };
 } // namespace Umbra

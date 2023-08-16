@@ -5,6 +5,7 @@
 
 #include <AzCore/Asset/AssetManager.h>
 #include <AzCore/RTTI/BehaviorContext.h>
+#include <AzCore/Serialization/EditContext.h>
 #include <AzCore/Serialization/SerializeContext.h>
 #include <UmbraSystemComponent/UmbraSystemComponentController.h>
 
@@ -20,6 +21,16 @@ namespace Umbra
                 ->Version(0)
                 ->Field("Configuration", &UmbraSystemComponentController::m_configuration)
                 ;
+
+            if (auto editContext = serializeContext->GetEditContext())
+            {
+                editContext->Class<UmbraSystemComponentController>("UmbraSystemComponentController", "")
+                    ->ClassElement(AZ::Edit::ClassElements::EditorData, "")
+                    ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
+                    ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraSystemComponentController::m_configuration, "Configuration", "")
+                    ->Attribute(AZ::Edit::Attributes::Visibility, AZ::Edit::PropertyVisibility::ShowChildrenOnly)
+                    ;
+            }
         }
 
         if (auto behaviorContext = azrtti_cast<AZ::BehaviorContext*>(context))
@@ -44,6 +55,8 @@ namespace Umbra
 
     void UmbraSystemComponentController::GetRequiredServices([[maybe_unused]] AZ::ComponentDescriptor::DependencyArrayType& services)
     {
+        services.push_back(AZ_CRC("AssetDatabaseService"));
+        services.push_back(AZ_CRC("AssetCatalogService"));
     }
 
     UmbraSystemComponentController::UmbraSystemComponentController(const UmbraSystemComponentConfig& config)

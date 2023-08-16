@@ -34,6 +34,10 @@ namespace Umbra
         const UmbraObjectComponentConfig& GetConfiguration() const;
 
         //! UmbraObjectComponentRequestBus overrides...
+        void SetCanOcclude(bool canOcclude) override;
+        bool GetCanOcclude() const override;
+        void SetCanBeOccluded(bool canBeOccluded) override;
+        bool GetCanBeOccluded() const override;
 
     private:
         AZ_DISABLE_COPY(UmbraObjectComponentController);

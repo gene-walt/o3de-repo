@@ -8,6 +8,7 @@
 #include <AzCore/Component/Component.h>
 #include <AzCore/Memory/SystemAllocator.h>
 #include <AzCore/RTTI/RTTI.h>
+#include <Umbra/UmbraSceneAsset/UmbraSceneSettings.h>
 
 namespace AZ
 {
@@ -22,11 +23,9 @@ namespace Umbra
     public:
         AZ_RTTI(UmbraViewVolumeComponentConfig, "{845FC090-884E-4EFF-B8F3-2D038BC49424}", AZ::ComponentConfig);
         AZ_CLASS_ALLOCATOR(UmbraViewVolumeComponentConfig, AZ::SystemAllocator);
-
         static void Reflect(AZ::ReflectContext* context);
 
-        float m_collisionRadius = 0.125f;
-        float m_smallestHole = 0.5f;
-        float m_smallestOccluder = 3.f;
+        bool m_overrideSceneSettings = false;
+        UmbraSceneSettings m_sceneSettings;
     };
 } // namespace Umbra

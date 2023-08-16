@@ -35,6 +35,10 @@ namespace Umbra
         const UmbraViewVolumeComponentConfig& GetConfiguration() const;
 
         //! UmbraViewVolumeComponentRequestBus overrides...
+        void SetOverrideSceneSettings(bool overrideSceneSettings);
+        bool GetOverrideSceneSettings() const;
+        void SetSceneSettings(const UmbraSceneSettings& sceneSettings);
+        const UmbraSceneSettings& GetSceneSettings() const;
 
     private:
         AZ_DISABLE_COPY(UmbraViewVolumeComponentController);

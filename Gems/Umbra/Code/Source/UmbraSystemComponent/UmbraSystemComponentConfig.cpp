@@ -4,6 +4,7 @@
  */
 
 #include <AzCore/RTTI/BehaviorContext.h>
+#include <AzCore/Serialization/EditContext.h>
 #include <AzCore/Serialization/SerializeContext.h>
 #include <Umbra/UmbraSystemComponent/UmbraSystemComponentConfig.h>
 
@@ -16,6 +17,15 @@ namespace Umbra
             serializeContext->Class<UmbraSystemComponentConfig, AZ::ComponentConfig>()
                 ->Version(0)
                 ;
+
+            if (auto editContext = serializeContext->GetEditContext())
+            {
+                editContext->Class<UmbraSystemComponentConfig>("UmbraSystemComponentConfig", "")
+                    ->ClassElement(AZ::Edit::ClassElements::EditorData, "")
+                    ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
+                    ->Attribute(AZ::Edit::Attributes::Visibility, AZ::Edit::PropertyVisibility::Show)
+                    ;
+            }
         }
 
         if (auto behaviorContext = azrtti_cast<AZ::BehaviorContext*>(context))

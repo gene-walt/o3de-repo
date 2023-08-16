@@ -4,10 +4,10 @@
  */
 
 #include <AzCore/RTTI/BehaviorContext.h>
+#include <AzCore/Serialization/EditContext.h>
 #include <AzCore/Serialization/SerializeContext.h>
 #include <AzToolsFramework/API/ToolsApplicationAPI.h>
 #include <UmbraViewVolumeComponent/EditorUmbraViewVolumeComponent.h>
-#include <UmbraViewVolumeComponent/EditorUmbraViewVolumeComponentUtil.h>
 
 namespace Umbra
 {
@@ -32,24 +32,6 @@ namespace Umbra
                         ->Attribute(AZ::Edit::Attributes::AppearsInAddComponentMenu, AZ_CRC_CE("Game"))
                         ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
                         ->Attribute(AZ::Edit::Attributes::HelpPageURL, "")
-                    ;
-
-                editContext->Class<UmbraViewVolumeComponentController>(
-                    "Umbra View Volume Component Controller", "")
-                    ->ClassElement(AZ::Edit::ClassElements::EditorData, "")
-                        ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
-                    ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraViewVolumeComponentController::m_configuration, "Configuration", "")
-                        ->Attribute(AZ::Edit::Attributes::Visibility, AZ::Edit::PropertyVisibility::ShowChildrenOnly)
-                    ;
-
-                editContext->Class<UmbraViewVolumeComponentConfig>(
-                    "Umbra View Volume Component Config", "")
-                    ->ClassElement(AZ::Edit::ClassElements::EditorData, "")
-                    ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
-                    ->Attribute(AZ::Edit::Attributes::Visibility, AZ::Edit::PropertyVisibility::Hide)
-                    ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraViewVolumeComponentConfig::m_collisionRadius, "Collision Radius", "")
-                    ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraViewVolumeComponentConfig::m_smallestHole, "Smallest Hole", "")
-                    ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraViewVolumeComponentConfig::m_smallestOccluder, "Smallest Occluder", "")
                     ;
             }
         }

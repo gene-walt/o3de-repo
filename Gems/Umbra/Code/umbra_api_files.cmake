@@ -10,6 +10,7 @@ set(FILES
     Include/Umbra/UmbraObjectComponent/UmbraObjectComponentConstants.h
     Include/Umbra/UmbraSceneAsset/UmbraObjectDescriptor.h
     Include/Umbra/UmbraSceneAsset/UmbraSceneAsset.h
+    Include/Umbra/UmbraSceneAsset/UmbraSceneSettings.h
     Include/Umbra/UmbraSceneComponent/UmbraSceneComponentBus.h
     Include/Umbra/UmbraSceneComponent/UmbraSceneComponentConfig.h
     Include/Umbra/UmbraSceneComponent/UmbraSceneComponentConstants.h

@@ -5,6 +5,7 @@
 
 #include <AzCore/Asset/AssetSerializer.h>
 #include <AzCore/RTTI/BehaviorContext.h>
+#include <AzCore/Serialization/EditContext.h>
 #include <AzCore/Serialization/SerializeContext.h>
 #include <Umbra/UmbraSceneComponent/UmbraSceneComponentConfig.h>
 
@@ -16,11 +17,22 @@ namespace Umbra
         {
             serializeContext->Class<UmbraSceneComponentConfig, AZ::ComponentConfig>()
                 ->Version(0)
-                ->Field("collisionRadius", &UmbraSceneComponentConfig::m_collisionRadius)
-                ->Field("smallestHole", &UmbraSceneComponentConfig::m_smallestHole)
-                ->Field("smallestOccluder", &UmbraSceneComponentConfig::m_smallestOccluder)
+                ->Field("sceneSettings", &UmbraSceneComponentConfig::m_sceneSettings)
                 ->Field("sceneAsset", &UmbraSceneComponentConfig::m_sceneAsset)
+                ->Field("onlyStaticObjects", &UmbraSceneComponentConfig::m_onlyStaticObjects)
                 ;
+
+            if (auto editContext = serializeContext->GetEditContext())
+            {
+                editContext->Class<UmbraSceneComponentConfig>("UmbraSceneComponentConfig", "")
+                    ->ClassElement(AZ::Edit::ClassElements::EditorData, "")
+                    ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
+                    ->Attribute(AZ::Edit::Attributes::Visibility, AZ::Edit::PropertyVisibility::Show)
+                    ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraSceneComponentConfig::m_sceneSettings, "Scene Settings", "")
+                    ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraSceneComponentConfig::m_sceneAsset, "Scene Asset", "")
+                    ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraSceneComponentConfig::m_onlyStaticObjects, "Only Static Objects", "")
+                    ;
+            }
         }
 
         if (auto behaviorContext = azrtti_cast<AZ::BehaviorContext*>(context))
@@ -31,6 +43,9 @@ namespace Umbra
                 ->Attribute(AZ::Script::Attributes::Module, "umbra")
                 ->Constructor()
                 ->Constructor<const UmbraSceneComponentConfig&>()
+                ->Property("sceneSettings", BehaviorValueProperty(&UmbraSceneComponentConfig::m_sceneSettings))
+                ->Property("sceneAsset", BehaviorValueProperty(&UmbraSceneComponentConfig::m_sceneAsset))
+                ->Property("onlyStaticObjects", BehaviorValueProperty(&UmbraSceneComponentConfig::m_onlyStaticObjects))
                 ;
         }
     }

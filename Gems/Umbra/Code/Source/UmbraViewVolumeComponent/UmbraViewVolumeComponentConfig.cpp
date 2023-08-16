@@ -4,6 +4,8 @@
  */
 
 #include <AzCore/RTTI/BehaviorContext.h>
+#include <AzCore/RTTI/ReflectContext.h>
+#include <AzCore/Serialization/EditContext.h>
 #include <AzCore/Serialization/SerializeContext.h>
 #include <Umbra/UmbraViewVolumeComponent/UmbraViewVolumeComponentConfig.h>
 
@@ -13,12 +15,22 @@ namespace Umbra
     {
         if (auto serializeContext = azrtti_cast<AZ::SerializeContext*>(context))
         {
-            serializeContext->Class<UmbraViewVolumeComponentConfig, AZ::ComponentConfig>()
+            serializeContext->Class<UmbraViewVolumeComponentConfig>()
                 ->Version(0)
-                ->Field("collisionRadius", &UmbraViewVolumeComponentConfig::m_collisionRadius)
-                ->Field("smallestHole", &UmbraViewVolumeComponentConfig::m_smallestHole)
-                ->Field("smallestOccluder", &UmbraViewVolumeComponentConfig::m_smallestOccluder)
+                ->Field("overrideSceneSettings", &UmbraViewVolumeComponentConfig::m_overrideSceneSettings)
+                ->Field("sceneSettings", &UmbraViewVolumeComponentConfig::m_sceneSettings)
                 ;
+
+            if (auto editContext = serializeContext->GetEditContext())
+            {
+                editContext->Class<UmbraViewVolumeComponentConfig>("UmbraViewVolumeComponentConfig", "")
+                    ->ClassElement(AZ::Edit::ClassElements::EditorData, "")
+                    ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
+                    ->Attribute(AZ::Edit::Attributes::Visibility, AZ::Edit::PropertyVisibility::Show)
+                    ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraViewVolumeComponentConfig::m_overrideSceneSettings, "Override Scene Settings", "")
+                    ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraViewVolumeComponentConfig::m_sceneSettings, "Scene Settings", "")
+                    ;
+            }
         }
 
         if (auto behaviorContext = azrtti_cast<AZ::BehaviorContext*>(context))
@@ -29,6 +41,8 @@ namespace Umbra
                 ->Attribute(AZ::Script::Attributes::Module, "umbra")
                 ->Constructor()
                 ->Constructor<const UmbraViewVolumeComponentConfig&>()
+                ->Property("overrideSceneSettings", BehaviorValueProperty(&UmbraViewVolumeComponentConfig::m_overrideSceneSettings))
+                ->Property("sceneSettings", BehaviorValueProperty(&UmbraViewVolumeComponentConfig::m_sceneSettings))
                 ;
         }
     }

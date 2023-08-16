@@ -7,9 +7,11 @@
 
 #include <AzCore/Memory/SystemAllocator.h>
 #include <AzCore/RTTI/RTTI.h>
+#include <AzCore/std/containers/map.h>
 #include <AzCore/std/containers/vector.h>
 #include <AzCore/std/string/string.h>
 #include <Umbra/UmbraSceneAsset/UmbraObjectDescriptor.h>
+#include <Umbra/UmbraSceneAsset/UmbraSceneSettings.h>
 
 namespace AZ
 {
@@ -28,10 +30,8 @@ namespace Umbra
 
         static const char* Extension;
 
-        AZStd::string m_sceneFilename;
-        float m_collisionRadius = 0.125f;
-        float m_smallestHole = 0.5f;
-        float m_smallestOccluder = 3.f;
+        UmbraSceneSettings m_sceneSettings;
+        AZStd::unordered_map<uint32_t, UmbraSceneSettings> m_sceneSettingsByView;
         AZStd::vector<UmbraObjectDescriptor> m_objectDescriptors;
     };
 } // namespace Umbra

@@ -124,9 +124,28 @@ namespace Umbra
 
         // Set up tome computation parameters from scene descriptor.
         Umbra::ComputationParams params;
-        params.setParam(Umbra::ComputationParams::COLLISION_RADIUS, sceneDescriptor.m_collisionRadius);
-        params.setParam(Umbra::ComputationParams::SMALLEST_HOLE, sceneDescriptor.m_smallestHole);
-        params.setParam(Umbra::ComputationParams::SMALLEST_OCCLUDER, sceneDescriptor.m_smallestOccluder);
+        params.setParam(Umbra::ComputationParams::COLLISION_RADIUS, sceneDescriptor.m_sceneSettings.m_collisionRadius);
+        params.setParam(Umbra::ComputationParams::SMALLEST_HOLE, sceneDescriptor.m_sceneSettings.m_smallestHole);
+        params.setParam(Umbra::ComputationParams::SMALLEST_OCCLUDER, sceneDescriptor.m_sceneSettings.m_smallestOccluder);
+
+        // Update computation parameters with settings overridden by each view
+        for (const auto& sceneSettingsByViewPair : sceneDescriptor.m_sceneSettingsByView)
+        {
+            params.setVolumeParam(
+                sceneSettingsByViewPair.first,
+                Umbra::ComputationParams::COLLISION_RADIUS,
+                sceneSettingsByViewPair.second.m_collisionRadius);
+
+            params.setVolumeParam(
+                sceneSettingsByViewPair.first,
+                Umbra::ComputationParams::SMALLEST_HOLE,
+                sceneSettingsByViewPair.second.m_smallestHole);
+
+            params.setVolumeParam(
+                sceneSettingsByViewPair.first,
+                Umbra::ComputationParams::SMALLEST_OCCLUDER,
+                sceneSettingsByViewPair.second.m_smallestOccluder);
+        }
 
         // Initiate processing the umbra scene.
         Umbra::LocalComputation::Params localParams;
