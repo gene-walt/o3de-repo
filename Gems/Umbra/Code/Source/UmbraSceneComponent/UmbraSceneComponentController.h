@@ -8,6 +8,8 @@
 #include <AzCore/Asset/AssetCommon.h>
 #include <AzCore/Asset/AssetManager.h>
 #include <AzCore/Component/Component.h>
+#include <AzFramework/Entity/EntityDebugDisplayBus.h>
+#include <AzFramework/Visibility/OcclusionBus.h>
 #include <Umbra/UmbraSceneComponent/UmbraSceneComponentBus.h>
 #include <Umbra/UmbraSceneComponent/UmbraSceneComponentConfig.h>
 
@@ -17,9 +19,15 @@
 
 namespace Umbra
 {
-    //! Loads and manages an umbra scene asset and processes occlusion queries
+    //! UmbraSceneComponentController loads and manages umbra scene assets containing precomputed visibility data. Once this asset is
+    //! loaded, occlusion queries can be made against the precomputed visibility data. Entity visibility checks will first determine if the
+    //! entity was part of the occlusion scene And return immediately if the query provides precomputed data for that entity. Otherwise,
+    //! entity visibility checks will do simple AABB tests against the occlusion buffer. This class implements OcclusionRequestBus and
+    //! supports creating multiple occlusion views from different perspectives and parallel occlusion queries.
     class UmbraSceneComponentController final
         : UmbraSceneComponentRequestBus::Handler
+        , AzFramework::OcclusionRequestBus::Handler
+        , AzFramework::EntityDebugDisplayEventBus::Handler
         , AZ::Data::AssetBus::Handler
     {
     public:
@@ -47,13 +55,21 @@ namespace Umbra
         void SetSceneAssetPath(const AZStd::string& path) override;
         AZ::Data::Asset<const UmbraSceneAsset> GetSceneAsset() const override;
         AZ::Data::AssetId GetSceneAssetId() const override;
-        bool UpdateVisibility(const AZ::Matrix4x4& cameraWorldToClip, const AZ::Vector3& cameraWorldPos) override;
-        bool IsEntityVisible(const AZ::EntityId& entityId) const override;
-        bool IsAabbVisible(const AZ::Aabb& bounds) const override;
+        bool IsSceneReady() const override;
 
-    private
-            :
+        //! AzFramework::OcclusionRequestBus::Handler overrides...
+        void ClearOcclusionViewDebugInfo() override;
+        bool CreateOcclusionView(const AZ::Name& name) override;
+        bool DestroyOcclusionView(const AZ::Name& name) override;
+        bool UpdateOcclusionView(const AZ::Name& name, const AZ::Vector3& cameraWorldPos, const AZ::Matrix4x4& cameraWorldToClip) override;
+        bool IsEntityVisibleInOcclusionView(const AZ::Name& name, const AZ::EntityId& entityId) const override;
+        bool IsAabbVisibleInOcclusionView(const AZ::Name& name, const AZ::Aabb& bounds) const override;
+
+    private:
         AZ_DISABLE_COPY(UmbraSceneComponentController);
+
+        //! AzFramework::DebugDisplayRequestBus::Handler overrides...
+        void DisplayEntityViewport(const AzFramework::ViewportInfo& viewportInfo, AzFramework::DebugDisplayRequests& debugDisplay) override;
 
         //! AZ::Data::AssetBus overrides...
         void OnAssetReady(AZ::Data::Asset<AZ::Data::AssetData> asset) override;
@@ -61,18 +77,77 @@ namespace Umbra
         void OnAssetError(AZ::Data::Asset<AZ::Data::AssetData> asset) override;
         void OnAssetReloadError(AZ::Data::Asset<AZ::Data::AssetData> asset) override;
 
+        //! Request loading the scene asset from the component configuration
         void QueueScene();
+        //! Once the scene asset has been loaded, create an umbra tome and dependencies to support occlusion queries
         void CreateScene();
+        //! Destroy the umbra tome dependencies
         void ReleaseScene();
- 
+
         AZ::EntityId m_entityId;
         UmbraSceneComponentConfig m_configuration;
 
+        // This is the runtime version of the precomputed visibility data created from data serialized with the scene asset.
         const Umbra::Tome* m_tome = nullptr;
-        AZStd::unique_ptr<Umbra::Query> m_query;
-        AZStd::vector<int32_t> m_objectIndexListStorage;
-        AZStd::unique_ptr<Umbra::IndexList> m_objectIndexList;
-        AZStd::unique_ptr<Umbra::OcclusionBuffer> m_occlusionBuffer;
+        // Container of all entity IDs that contributed to the precomputed visibility data.
         AZStd::unordered_set<AZ::EntityId> m_occlusionEntities;
+
+        // Capturing data for unique line rendering requests. The data is stored as a set of tuples to automatically eliminate duplicates
+        // without implementing custom sort and removal logic. Each tuple contains 10 floats, the first four represent rgba color values,
+        // the next three represent the starting point for the line segment, the last three represent the end point for the line segment.
+        using UmbraDebugRendererLine = AZStd::tuple<float, float, float, float, float, float, float, float, float, float>;
+        using UmbraDebugRendererLineSet = AZStd::set<UmbraDebugRendererLine>;
+
+        //! UmbraDebugRenderer works with occlusion queries to capture all of the data for visualizing stats and line segments for umbra
+        //! objects like bounding boxes, view frustums, and the visibility buffer.
+        class UmbraDebugRenderer : public Umbra::DebugRenderer
+        {
+        public:
+            UmbraDebugRenderer() = default;
+            void addLine(const Umbra::Vector3& start, const Umbra::Vector3& end, const Umbra::Vector4& color) override;
+            void addStat(const char* stat, int val) override;
+
+            UmbraDebugRendererLineSet m_debugLines;
+            AZStd::set<AZStd::pair<AZStd::string, int>> m_debugStats;
+        };
+
+        //! UmbraOcclusionView embodies the data for a single occlusion query. Multiple UmbraOcclusionView can exist simultaneously
+        //! alongside corresponding graphics views. They can be updated and queried in parallel.
+        class UmbraOcclusionView final
+        {
+        public:
+            AZ_CLASS_ALLOCATOR(UmbraOcclusionView, AZ::SystemAllocator);
+            AZ_RTTI(UmbraOcclusionView, "{22FA80C6-A096-4A2E-BF93-3AF75E688656}");
+
+            UmbraOcclusionView(UmbraSceneComponentController& controller);
+            ~UmbraOcclusionView();
+            bool Update(const AZ::Vector3& cameraWorldPos, const AZ::Matrix4x4& cameraWorldToClip);
+            bool IsEntityVisible(const AZ::EntityId& entityId) const;
+            bool IsAabbVisible(const AZ::Aabb& bounds) const;
+
+        private:
+            AZ_DISABLE_COPY(UmbraOcclusionView);
+
+            // Reference to controller to access tome, assets, and debug containers
+            UmbraSceneComponentController& m_controller;
+            // Umbra query object that performs occlusion culling queries against the tome
+            AZStd::unique_ptr<Umbra::Query> m_query;
+            // Vector used as storage for object indices, pre allocating enough space for all object indices in the tome
+            AZStd::vector<int32_t> m_objectIndexListStorage;
+            // Object list using the above vector as storage. The list will be populated with with indices after each query is executed.
+            AZStd::unique_ptr<Umbra::IndexList> m_objectIndexList;
+            // Occlusion buffer contains depth data from the previous query to test visibility for dynamic object bounding boxes.
+            AZStd::unique_ptr<Umbra::OcclusionBuffer> m_occlusionBuffer;
+            // Interfaces with umbra and the query object to gather debug lines and statistics
+            AZStd::unique_ptr<UmbraDebugRenderer> m_debugRenderer;
+        };
+
+        // All currently active occlusion views.
+        AZStd::unordered_map<AZ::Name, AZStd::unique_ptr<UmbraOcclusionView>> m_occlusionViewMap;
+
+        // Sets of debug data accumulated from all occlusion views.
+        AZStd::mutex m_debugMutex;
+        UmbraDebugRendererLineSet m_debugLines;
+        AZStd::set<AZStd::pair<AZStd::string, int>> m_debugStats;
     };
 } // namespace Umbra

@@ -17,10 +17,16 @@ namespace Umbra
         {
             serializeContext->Class<UmbraSceneComponentConfig, AZ::ComponentConfig>()
                 ->Version(0)
+                ->Field("pauseDebugInfo", &UmbraSceneComponentConfig::m_pauseDebugInfo)
+                ->Field("renderDebugInfo", &UmbraSceneComponentConfig::m_renderDebugInfo)
+                ->Field("renderDebugBounds", &UmbraSceneComponentConfig::m_renderDebugBounds)
+                ->Field("renderDebugBuffers", &UmbraSceneComponentConfig::m_renderDebugBuffers)
+                ->Field("renderDebugFrustums", &UmbraSceneComponentConfig::m_renderDebugFrustums)
+                ->Field("renderDebugVolumes", &UmbraSceneComponentConfig::m_renderDebugVolumes)
+                ->Field("renderDebugStats", &UmbraSceneComponentConfig::m_renderDebugStats)
                 ->Field("sceneSettings", &UmbraSceneComponentConfig::m_sceneSettings)
                 ->Field("sceneAsset", &UmbraSceneComponentConfig::m_sceneAsset)
-                ->Field("onlyStaticObjects", &UmbraSceneComponentConfig::m_onlyStaticObjects)
-                ;
+                ->Field("exportStaticObjectsOnly", &UmbraSceneComponentConfig::m_exportStaticObjectsOnly);
 
             if (auto editContext = serializeContext->GetEditContext())
             {
@@ -28,9 +34,18 @@ namespace Umbra
                     ->ClassElement(AZ::Edit::ClassElements::EditorData, "")
                     ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
                     ->Attribute(AZ::Edit::Attributes::Visibility, AZ::Edit::PropertyVisibility::Show)
-                    ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraSceneComponentConfig::m_sceneSettings, "Scene Settings", "")
-                    ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraSceneComponentConfig::m_sceneAsset, "Scene Asset", "")
-                    ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraSceneComponentConfig::m_onlyStaticObjects, "Only Static Objects", "")
+                    ->ClassElement(AZ::Edit::ClassElements::Group, "Debug")
+                    ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraSceneComponentConfig::m_pauseDebugInfo, "Pause Debug Info", "Freezes the state of debug rendering and statistics")
+                    ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraSceneComponentConfig::m_renderDebugInfo, "Render Debug Info", "Gather and display debug lines and statistics from occlusion queries")
+                    ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraSceneComponentConfig::m_renderDebugBounds, "Render Debug Bounds", "When debug rendering is enabled, display bounding boxes for all occlusion objects")
+                    ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraSceneComponentConfig::m_renderDebugBuffers, "Render Debug Buffers", "When debug rendering is enabled, display a 3D visualization of the visibility buffer")
+                    ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraSceneComponentConfig::m_renderDebugFrustums, "Render Debug Frustums", "When debug rendering is enabled, display lines for the view frustum")
+                    ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraSceneComponentConfig::m_renderDebugVolumes, "Render Debug Volumes", "When debug rendering is enabled, display lines for volumes")
+                    ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraSceneComponentConfig::m_renderDebugStats, "Render Debug Stats", "When debug rendering is enabled, display stats collected from occlusion queries")
+                    ->ClassElement(AZ::Edit::ClassElements::Group, "")
+                    ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraSceneComponentConfig::m_sceneSettings, "Scene Settings", "Settings to configure how steam data is processed by the builder")
+                    ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraSceneComponentConfig::m_sceneAsset, "Scene Asset", "The scene asset containing precomputed visibility data for occlusion queries")
+                    ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraSceneComponentConfig::m_exportStaticObjectsOnly, "Export Static Objects Only", "If enabled, only objects with static transforms will be exported with the umbra scene")
                     ;
             }
         }
@@ -43,9 +58,16 @@ namespace Umbra
                 ->Attribute(AZ::Script::Attributes::Module, "umbra")
                 ->Constructor()
                 ->Constructor<const UmbraSceneComponentConfig&>()
+                ->Property("pauseDebugInfo", BehaviorValueProperty(&UmbraSceneComponentConfig::m_pauseDebugInfo))
+                ->Property("renderDebugInfo", BehaviorValueProperty(&UmbraSceneComponentConfig::m_renderDebugInfo))
+                ->Property("renderDebugBounds", BehaviorValueProperty(&UmbraSceneComponentConfig::m_renderDebugBounds))
+                ->Property("renderDebugBuffers", BehaviorValueProperty(&UmbraSceneComponentConfig::m_renderDebugBuffers))
+                ->Property("renderDebugFrustums", BehaviorValueProperty(&UmbraSceneComponentConfig::m_renderDebugFrustums))
+                ->Property("renderDebugVolumes", BehaviorValueProperty(&UmbraSceneComponentConfig::m_renderDebugVolumes))
+                ->Property("renderDebugStats", BehaviorValueProperty(&UmbraSceneComponentConfig::m_renderDebugStats))
                 ->Property("sceneSettings", BehaviorValueProperty(&UmbraSceneComponentConfig::m_sceneSettings))
                 ->Property("sceneAsset", BehaviorValueProperty(&UmbraSceneComponentConfig::m_sceneAsset))
-                ->Property("onlyStaticObjects", BehaviorValueProperty(&UmbraSceneComponentConfig::m_onlyStaticObjects))
+                ->Property("exportStaticObjectsOnly", BehaviorValueProperty(&UmbraSceneComponentConfig::m_exportStaticObjectsOnly))
                 ;
         }
     }

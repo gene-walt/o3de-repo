@@ -78,6 +78,7 @@ namespace Umbra
     {
         BaseClass::Activate();
         UmbraSceneComponentNotificationBus::Handler::BusConnect(GetEntityId());
+        m_contextId = GetEntityContextId(GetEntityId());
     }
 
     void EditorUmbraSceneComponent::Deactivate()
@@ -159,19 +160,9 @@ namespace Umbra
             [&sceneDescriptor, scene, this](AzFramework::VisibleGeometryRequestBus::Events* handler) -> bool
             {
                 const AZ::EntityId entityId = *(AzFramework::VisibleGeometryRequestBus::GetCurrentBusId());
-
-                if (m_controller.GetConfiguration().m_onlyStaticObjects)
+                if (!ShouldExportEntity(entityId))
                 {
-                    // Use the transform bus to determine if the object has a static transform.
-                    bool isStatic = false;
-                    AZ::TransformBus::Event(entityId, [&isStatic](AZ::TransformBus::Events* handler) {
-                        isStatic = handler->IsStaticTransform();
-                    });
-
-                    if (!isStatic)
-                    {
-                        return true;
-                    }
+                    return true;
                 }
 
                 // Override the default scene object settings and flags with values from the umbra object component if one is present.
@@ -201,9 +192,9 @@ namespace Umbra
                         aznumeric_cast<int>(geometry.m_indices.size() / 3));
 
                     Umbra::Matrix4x4 transform = {};
-                    geometry.m_transform.StoreToColumnMajorFloat16(reinterpret_cast<float*>(transform.m));
+                    geometry.m_transform.StoreToRowMajorFloat16(reinterpret_cast<float*>(transform.m));
 
-                    scene->insertObject(model, transform, objectIndex, flags, Umbra::MF_COLUMN_MAJOR);
+                    scene->insertObject(model, transform, objectIndex, flags, Umbra::MF_ROW_MAJOR);
 
                     UmbraObjectDescriptor objectDescriptor;
                     objectDescriptor.m_entityId = entityId;
@@ -218,19 +209,9 @@ namespace Umbra
             [&sceneDescriptor, scene, this]([[maybe_unused]] UmbraViewVolumeComponentRequestBus::Events* handler) -> bool
             {
                 const AZ::EntityId entityId = *(UmbraViewVolumeComponentRequestBus::GetCurrentBusId());
-
-                if (m_controller.GetConfiguration().m_onlyStaticObjects)
+                if (!ShouldExportEntity(entityId))
                 {
-                    // Use the transform bus to determine if the object has a static transform.
-                    bool isStatic = false;
-                    AZ::TransformBus::Event(entityId, [&isStatic](AZ::TransformBus::Events* handler) {
-                        isStatic = handler->IsStaticTransform();
-                    });
-
-                    if (!isStatic)
-                    {
-                        return true;
-                    }
+                    return true;
                 }
 
                 // Use the entity world bounds to determine the balance of the bounding box for the view volume.
@@ -279,5 +260,36 @@ namespace Umbra
         }
 
         return true;
+    }
+
+    bool EditorUmbraSceneComponent::ShouldExportEntity(const AZ::EntityId& entityId) const
+    {
+        if (m_contextId != GetEntityContextId(entityId))
+        {
+            return false;
+        }
+
+        if (m_controller.GetConfiguration().m_exportStaticObjectsOnly)
+        {
+            // Use the transform bus to determine if the object has a static transform.
+            bool isStatic = false;
+            AZ::TransformBus::Event(entityId, [&isStatic](AZ::TransformBus::Events* handler) {
+                isStatic = handler->IsStaticTransform();
+            });
+
+            if (!isStatic)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    AzFramework::EntityContextId EditorUmbraSceneComponent::GetEntityContextId(const AZ::EntityId& entityId) const
+    {
+        AzFramework::EntityContextId contextId = AzFramework::EntityContextId::CreateNull();
+        AzFramework::EntityIdContextQueryBus::EventResult(
+            contextId, entityId, &AzFramework::EntityIdContextQueryBus::Events::GetOwningContextId);
+        return contextId;
     }
 } // namespace Umbra

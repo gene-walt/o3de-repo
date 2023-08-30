@@ -27,8 +27,15 @@ namespace Umbra
         AZ_CLASS_ALLOCATOR(UmbraSceneComponentConfig, AZ::SystemAllocator);
         static void Reflect(AZ::ReflectContext* context);
 
+        bool m_pauseDebugInfo = false;
+        bool m_renderDebugInfo = false;
+        bool m_renderDebugBounds = false;
+        bool m_renderDebugBuffers = false;
+        bool m_renderDebugFrustums = false;
+        bool m_renderDebugVolumes = false;
+        bool m_renderDebugStats = false;
         UmbraSceneSettings m_sceneSettings;
         AZ::Data::Asset<UmbraSceneAsset> m_sceneAsset;
-        bool m_onlyStaticObjects = true;
+        bool m_exportStaticObjectsOnly = true;
     };
 } // namespace Umbra

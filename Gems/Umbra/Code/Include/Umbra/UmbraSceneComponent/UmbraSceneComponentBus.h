@@ -23,6 +23,8 @@ namespace Umbra
     class UmbraSceneComponentRequests : public AZ::ComponentBus
     {
     public:
+        using MutexType = AZStd::mutex;
+
         //! Sets the scene asset used by the component.
         virtual void SetSceneAsset(AZ::Data::Asset<UmbraSceneAsset> asset) = 0;
         //! Sets the scene asset used by the component by AssetId.
@@ -33,12 +35,8 @@ namespace Umbra
         virtual AZ::Data::Asset<const UmbraSceneAsset> GetSceneAsset() const = 0;
         //! Returns the AssetId for the scene used by the component.
         virtual AZ::Data::AssetId GetSceneAssetId() const = 0;
-        //! Update the scenes visibility state based on the camera transform. 
-        virtual bool UpdateVisibility(const AZ::Matrix4x4& cameraWorldToClip, const AZ::Vector3& cameraWorldPos) = 0;
-        //! Returns true if the entity is not occluded based on the current scene state. 
-        virtual bool IsEntityVisible(const AZ::EntityId& entityId) const = 0;
-        //! Returns true if the AABB is visible based on the current scene state. 
-        virtual bool IsAabbVisible(const AZ::Aabb& bounds) const = 0;
+        //! Returns true if the scene asset is ready and the scene component is ready for requests.
+        virtual bool IsSceneReady() const = 0;
     };
     using UmbraSceneComponentRequestBus = AZ::EBus<UmbraSceneComponentRequests>;
 

@@ -33,8 +33,11 @@ namespace Umbra
         void Deactivate() override;
 
         AZ::u32 GenerateUmbraScene();
-
         bool GenerateUmbraSceneFromLevel(const AZStd::string& scenePath) const;
+        bool ShouldExportEntity(const AZ::EntityId& entityId) const;
+        AzFramework::EntityContextId GetEntityContextId(const AZ::EntityId& entityId) const;
+
+        AzFramework::EntityContextId m_contextId = AzFramework::EntityContextId::CreateNull();
 
         static constexpr const char* GenerateUmbraSceneButtonText = "Generate Umbra Scene...";
         static constexpr const char* GenerateUmbraSceneToolTipText = "Generate and save an umbra scene from level entities.";
