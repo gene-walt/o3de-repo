@@ -24,8 +24,8 @@ namespace Umbra
         AZ_CLASS_ALLOCATOR(UmbraSceneSettings, AZ::SystemAllocator);
         static void Reflect(AZ::ReflectContext* context);
 
-        float m_collisionRadius = 0.125f;
-        float m_smallestHole = 0.5f;
-        float m_smallestOccluder = 3.f;
+        float m_collisionRadius = 0.1f;
+        float m_smallestHole = 0.1f;
+        float m_smallestOccluder = 0.1f;
     };
 } // namespace Umbra
