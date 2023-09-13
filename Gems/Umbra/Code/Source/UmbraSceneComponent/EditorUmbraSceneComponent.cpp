@@ -194,6 +194,9 @@ namespace Umbra
                     Umbra::Matrix4x4 transform = {};
                     geometry.m_transform.StoreToRowMajorFloat16(reinterpret_cast<float*>(transform.m));
 
+                    // Transparent geometry will automatically be excluded as occluders.
+                    flags &= geometry.m_transparent ? ~Umbra::SceneObject::OCCLUDER : 1;
+
                     scene->insertObject(model, transform, objectIndex, flags, Umbra::MF_ROW_MAJOR);
 
                     UmbraObjectDescriptor objectDescriptor;
