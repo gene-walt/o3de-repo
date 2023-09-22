@@ -9,6 +9,7 @@
 #include <AzCore/Serialization/Utils.h>
 #include <AzCore/std/algorithm.h>
 #include <AzCore/std/smart_ptr/make_shared.h>
+#include <AzCore/Utils/Utils.h>
 #include <AzFramework/IO/LocalFileIO.h>
 #include <AzFramework/StringFunc/StringFunc.h>
 #include <AzToolsFramework/API/EditorAssetSystemAPI.h>
@@ -152,6 +153,15 @@ namespace Umbra
         localParams.computationParams = &params;
         localParams.scene = scene;
         localParams.cacheSizeMegs = 100;
+        localParams.numThreads = -1;
+
+        // Attempt to read the license key from an environment variable instead of relying on license files in the working directory or bin
+        // folder.
+        char licenseEnvBuffer[256]{};
+        if (auto licenseEnvOutcome = AZ::Utils::GetEnv(licenseEnvBuffer, "UMBRA_LICENSE_KEY"); licenseEnvOutcome)
+        {
+            localParams.licenseKey = licenseEnvBuffer;
+        }
 
         Umbra::Computation* computation = LocalComputation::create(localParams);
         Umbra::Computation::Result result = computation->waitForResult();
