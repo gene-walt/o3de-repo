@@ -24,9 +24,10 @@ namespace Umbra
         m_descriptors.insert(
             m_descriptors.end(),
             {
+                UmbraSystemComponent::CreateDescriptor(),
+
                 UmbraObjectComponent::CreateDescriptor(),
                 UmbraSceneComponent::CreateDescriptor(),
-                UmbraSystemComponent::CreateDescriptor(),
                 UmbraViewVolumeComponent::CreateDescriptor(),
             });
     }
