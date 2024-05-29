@@ -11,6 +11,33 @@
 #            <restricted_folder>/<platform_name>/Gems/Umbra/Code
 o3de_pal_dir(pal_dir ${CMAKE_CURRENT_LIST_DIR}/Platform/${PAL_PLATFORM_NAME} "${gem_restricted_path}" "${gem_path}" "${gem_parent_relative_path}")
 
+# Umbra Install Path
+set(LY_UMBRA_INSTALL_PATH "" CACHE PATH "Path to Umbra installation.")
+
+# Paths that will be checked, in order:
+# - CMake cache variable
+# - UMBRA_SDK_PATH Environment Variable
+set(UMBRA_SDK_PATHS
+    "${LY_UMBRA_INSTALL_PATH}"
+    "$ENV{UMBRA_SDK_PATH}"
+)
+
+set(found_sdk FALSE)
+foreach(candidate_path ${UMBRA_SDK_PATHS})
+    if(EXISTS ${candidate_path}/LICENSE.txt)
+        # Update the Umbra Install Path variable internally
+        set(found_sdk TRUE)
+        set(LY_UMBRA_INSTALL_PATH "${candidate_path}")
+        break()
+    endif()
+endforeach()
+
+if(NOT found_sdk)
+    # If we don't find a path that appears to be a valid Umbra install, we can bail here.
+    # No 3rdParty::umbra target will exist, so that can be checked elsewhere.
+    return()
+endif()
+
 # Now that we have the platform abstraction layer (PAL) folder for this folder, thats where we will find the
 # traits for this platform. Traits for a platform are defines for things like whether or not something in this gem
 # is supported by this platform.
@@ -19,6 +46,26 @@ include(${pal_dir}/PAL_${PAL_PLATFORM_NAME_LOWERCASE}.cmake)
 # Check to see if building the Gem Modules are supported for the current platform
 if(NOT PAL_TRAIT_UMBRA_SUPPORTED)
     return()
+endif()
+
+# this file actually ingests the library and defines targets.
+if (TARGET ${O3DE_UMBRA_TARGET})
+    return()
+endif()
+
+# set it to a generator expression for multi-config situations
+set(UMBRA_RUNTIME_DEPENDENCIES $<IF:$<CONFIG:Debug>,${UMBRA_LIBRARIES_DEBUG},${UMBRA_LIBRARIES_RELEASE}>)
+
+set(UMBRA_STATIC_LIBRARIES
+    "$<$<CONFIG:profile>:${UMBRA_STATIC_LIBRARIES_RELEASE}>"
+    "$<$<CONFIG:release>:${UMBRA_STATIC_LIBRARIES_RELEASE}>"
+    "$<$<CONFIG:debug>:${UMBRA_STATIC_LIBRARIES_DEBUG}>")
+
+add_library(${O3DE_UMBRA_TARGET} INTERFACE IMPORTED GLOBAL)
+ly_target_include_system_directories(TARGET ${O3DE_UMBRA_TARGET} INTERFACE ${LY_UMBRA_INSTALL_PATH}/interface)
+target_link_libraries(${O3DE_UMBRA_TARGET} INTERFACE ${UMBRA_STATIC_LIBRARIES})
+if(DEFINED UMBRA_RUNTIME_DEPENDENCIES)
+    ly_add_target_files(TARGETS ${O3DE_UMBRA_TARGET} FILES ${UMBRA_RUNTIME_DEPENDENCIES})
 endif()
 
 # The ${gem_name}.API target declares the common interface that users of this gem should depend on in their targets

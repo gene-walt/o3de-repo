@@ -22,8 +22,8 @@
 #include <UmbraSceneAsset/UmbraSceneDescriptor.h>
 #include <UmbraSceneComponent/EditorUmbraSceneComponent.h>
 
-#include <umbra/optimizer/umbraScene.hpp>
-#include <umbra/umbraInfo.hpp>
+#include <optimizer/umbraScene.hpp>
+#include <umbraInfo.hpp>
 
 #include <QMessageBox>
 #include <QObject>

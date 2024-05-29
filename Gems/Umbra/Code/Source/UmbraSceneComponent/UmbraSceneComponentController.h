@@ -13,9 +13,9 @@
 #include <Umbra/UmbraSceneComponent/UmbraSceneComponentBus.h>
 #include <Umbra/UmbraSceneComponent/UmbraSceneComponentConfig.h>
 
-#include <umbra/runtime/umbraQuery.hpp>
-#include <umbra/runtime/umbraTome.hpp>
-#include <umbra/umbraInfo.hpp>
+#include <runtime/umbraQuery.hpp>
+#include <runtime/umbraTome.hpp>
+#include <umbraInfo.hpp>
 
 namespace Umbra
 {

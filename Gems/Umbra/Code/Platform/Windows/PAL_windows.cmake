@@ -3,13 +3,23 @@
 # its licensors.
 #
 
-set(LY_PACKAGE_SERVER_URLS ${LY_PACKAGE_SERVER_URLS} "s3://ly-dev-3p-packages/")
-set(package_name umbra3-3.4.24)
-set(pk_package_hash 89ec8451247e9fc42d04f9b15380df51601df1aaf3a929087c7bc0f5d890f009)
-
-ly_associate_package(PACKAGE_NAME ${package_name} TARGETS umbra PACKAGE_HASH ${pk_package_hash})
-set(O3DE_UMBRA_TARGET "3rdParty::umbra")
-
 set(PAL_TRAIT_UMBRA_SUPPORTED TRUE)
 set(PAL_TRAIT_UMBRA_TEST_SUPPORTED FALSE)
 set(PAL_TRAIT_UMBRA_EDITOR_TEST_SUPPORTED FALSE)
+
+set(O3DE_UMBRA_TARGET "3rdParty::umbra")
+
+set(UMBRA_LIBRARIES_DEBUG
+    )
+set(UMBRA_LIBRARIES_RELEASE
+    )
+set(UMBRA_STATIC_LIBRARIES_DEBUG
+    ${LY_UMBRA_INSTALL_PATH}/lib/win64_md_vs2019/umbracommon64_d.lib
+    ${LY_UMBRA_INSTALL_PATH}/lib/win64_md_vs2019/umbraobjectgrouper64_d.lib
+    ${LY_UMBRA_INSTALL_PATH}/lib/win64_md_vs2019/umbraruntime64_d.lib
+    ${LY_UMBRA_INSTALL_PATH}/lib/win64_md_vs2019/umbraoptimizer_static64_d.lib)
+set(UMBRA_STATIC_LIBRARIES_RELEASE
+    ${LY_UMBRA_INSTALL_PATH}/lib/win64_md_vs2019/umbracommon64.lib
+    ${LY_UMBRA_INSTALL_PATH}/lib/win64_md_vs2019/umbraobjectgrouper64.lib
+    ${LY_UMBRA_INSTALL_PATH}/lib/win64_md_vs2019/umbraruntime64.lib
+    ${LY_UMBRA_INSTALL_PATH}/lib/win64_md_vs2019/umbraoptimizer_static64.lib)

@@ -17,11 +17,11 @@
 #include <UmbraSceneAsset/UmbraSceneAssetBuilder.h>
 #include <UmbraSceneAsset/UmbraSceneDescriptor.h>
 
-#include <umbra/optimizer/umbraLocalComputation.hpp>
-#include <umbra/optimizer/umbraScene.hpp>
-#include <umbra/runtime/umbraQuery.hpp>
-#include <umbra/runtime/umbraTome.hpp>
-#include <umbra/umbraInfo.hpp>
+#include <optimizer/umbraLocalComputation.hpp>
+#include <optimizer/umbraScene.hpp>
+#include <runtime/umbraQuery.hpp>
+#include <runtime/umbraTome.hpp>
+#include <umbraInfo.hpp>
 
 namespace Umbra
 {
