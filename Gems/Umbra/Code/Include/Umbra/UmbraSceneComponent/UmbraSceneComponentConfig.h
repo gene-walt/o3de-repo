@@ -37,5 +37,6 @@ namespace Umbra
         UmbraSceneSettings m_sceneSettings;
         AZ::Data::Asset<UmbraSceneAsset> m_sceneAsset;
         bool m_exportStaticObjectsOnly = true;
+        uint32_t m_additionalMemoryPerQuery = 1000000;
     };
 } // namespace Umbra

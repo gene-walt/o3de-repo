@@ -59,11 +59,18 @@ namespace Umbra
 
         //! AzFramework::OcclusionRequestBus::Handler overrides...
         void ClearOcclusionViewDebugInfo() override;
-        bool CreateOcclusionView(const AZ::Name& name) override;
-        bool DestroyOcclusionView(const AZ::Name& name) override;
-        bool UpdateOcclusionView(const AZ::Name& name, const AZ::Vector3& cameraWorldPos, const AZ::Matrix4x4& cameraWorldToClip) override;
-        bool IsEntityVisibleInOcclusionView(const AZ::Name& name, const AZ::EntityId& entityId) const override;
-        bool IsAabbVisibleInOcclusionView(const AZ::Name& name, const AZ::Aabb& bounds) const override;
+        bool IsOcclusionView(const AZ::Name& viewName) const override;
+        bool CreateOcclusionView(const AZ::Name& viewName) override;
+        bool DestroyOcclusionView(const AZ::Name& viewName) override;
+        bool UpdateOcclusionView(const AZ::Name& viewName, const AZ::Vector3& cameraWorldPos, const AZ::Matrix4x4& cameraWorldToClip) override;
+        bool GetOcclusionViewEntityVisibility(const AZ::Name& viewName, const AZ::EntityId& entityId) const override;
+        bool GetOcclusionViewAabbVisibility(const AZ::Name& viewName, const AZ::Aabb& bounds) const override;
+        AZStd::vector<bool> GetOcclusionViewAabbToAabbVisibility(
+            const AZ::Name& viewName, const AZ::Aabb& sourceAabb, const AZStd::vector<AZ::Aabb>& targetAabbs) const override;
+        AZStd::vector<bool> GetOcclusionViewSphereToSphereVisibility(
+            const AZ::Name& viewName, const AZ::Sphere& sourceSphere, const AZStd::vector<AZ::Sphere>& targetSpheres) const override;
+        AZStd::vector<bool> GetOcclusionViewEntityToEntityVisibility(
+            const AZ::Name& viewName, const AZ::EntityId& sourceEntityId, const AZStd::vector<AZ::EntityId>& targetEntityIds) const override;
 
     private:
         AZ_DISABLE_COPY(UmbraSceneComponentController);
@@ -122,8 +129,11 @@ namespace Umbra
             UmbraOcclusionView(UmbraSceneComponentController& controller);
             ~UmbraOcclusionView();
             bool Update(const AZ::Vector3& cameraWorldPos, const AZ::Matrix4x4& cameraWorldToClip);
-            bool IsEntityVisible(const AZ::EntityId& entityId) const;
-            bool IsAabbVisible(const AZ::Aabb& bounds) const;
+            bool GetEntityVisibility(const AZ::EntityId& entityId) const;
+            bool GetAabbVisibility(const AZ::Aabb& bounds) const;
+            AZStd::vector<bool> GetAabbToAabbVisibility(const AZ::Aabb& sourceAabb, const AZStd::vector<AZ::Aabb>& targetAabbs) const;
+            AZStd::vector<bool> GetSphereToSphereVisibility(const AZ::Sphere& sourceSphere, const AZStd::vector<AZ::Sphere>& targetSpheres) const;
+            AZStd::vector<bool> GetEntityToEntityVisibility(const AZ::EntityId& sourceEntityId, const AZStd::vector<AZ::EntityId>& targetEntityIds) const;
 
         private:
             AZ_DISABLE_COPY(UmbraOcclusionView);
@@ -131,7 +141,9 @@ namespace Umbra
             // Reference to controller to access tome, assets, and debug containers
             UmbraSceneComponentController& m_controller;
             // Umbra query object that performs occlusion culling queries against the tome
-            AZStd::unique_ptr<Umbra::Query> m_query;
+            AZStd::unique_ptr<Umbra::QueryExt> m_query;
+            // Additional working memory for umbrella queries.
+            AZStd::vector<AZ::u8> m_queryWorkMem;
             // Vector used as storage for object indices, pre allocating enough space for all object indices in the tome
             AZStd::vector<int32_t> m_objectIndexListStorage;
             // Object list using the above vector as storage. The list will be populated with with indices after each query is executed.

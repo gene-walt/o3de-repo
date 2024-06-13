@@ -15,6 +15,62 @@
 
 namespace Umbra
 {
+    namespace Internal
+    {
+        void PrintQueryErrorMessage(const Umbra::Query::ErrorCode errorCode)
+        {
+            switch (errorCode)
+            {
+            case Umbra::Query::ERROR_OK:
+                break;
+            case Umbra::Query::ERROR_GENERIC_ERROR:
+                AZ_Warning("UmbraSceneComponent", false, "Something completely unexpected happened.");
+                break;
+            case Umbra::Query::ERROR_OUT_OF_MEMORY:
+                AZ_Warning("UmbraSceneComponent", false, "Not enough memory was available in the Query context to perform the operation.");
+                break;
+            case Umbra::Query::ERROR_INVALID_ARGUMENT:
+                AZ_Warning("UmbraSceneComponent", false, "An invalid value was passed into queryPortalVisibility.");
+                break;
+            case Umbra::Query::ERROR_SLOTDATA_UNAVAILABLE:
+                AZ_Warning("UmbraSceneComponent", false, "A tile required to complete the Query was not present in the tome.");
+                break;
+            case Umbra::Query::ERROR_OUTSIDE_SCENE:
+                AZ_Warning("UmbraSceneComponent", false, "A query location was found to be outside of the scene boundaries.");
+                break;
+            case Umbra::Query::ERROR_NO_TOME:
+                AZ_Warning("UmbraSceneComponent", false, "queryPortalVisibility no data was given to the Query.");
+                break;
+            case Umbra::Query::ERROR_NO_PATH:
+                AZ_Warning("UmbraSceneComponent", false, "queryPortalVisibility path does not exist.");
+                break;
+            case Umbra::Query::ERROR_UNSUPPORTED_OPERATION:
+                AZ_Warning("UmbraSceneComponent", false, "queryPortalVisibility operation not supported.");
+                break;
+            case Umbra::Query::ERROR_FEATURE_REQUIRES_BASELEVEL:
+                AZ_Warning("UmbraSceneComponent", false, "Use of query features that don't work with accurate occlusion threshold < FLT_MAX.");
+                break;
+            default:
+                AZ_Warning("UmbraSceneComponent", false, "queryPortalVisibility returned unsupported result value.");
+                break;
+            }
+        }
+
+        AZ::Aabb GetEntityAabb(const AZ::EntityId& entityId)
+        {
+            AZ::Aabb bounds = AZ::Aabb::CreateNull();
+            AzFramework::BoundsRequestBus::EventResult(bounds, entityId, &AzFramework::BoundsRequestBus::Events::GetWorldBounds);
+            if (bounds.IsValid())
+            {
+                return bounds;
+            }
+
+            AZ::Transform transform = AZ::Transform::CreateIdentity();
+            AZ::TransformBus::EventResult(transform, entityId, &AZ::TransformBus::Events::GetWorldTM);
+            return AZ::Aabb::CreateFromPoint(transform.GetTranslation());
+        }
+    }
+
     void UmbraSceneComponentController::Reflect(AZ::ReflectContext* context)
     {
         UmbraSceneComponentConfig::Reflect(context);
@@ -162,38 +218,66 @@ namespace Umbra
         }
     }
 
-    bool UmbraSceneComponentController::CreateOcclusionView(const AZ::Name& name)
+    bool UmbraSceneComponentController::IsOcclusionView(const AZ::Name& viewName) const
     {
         if (!IsSceneReady())
         {
             return false;
         }
 
-        return m_occlusionViewMap.emplace(name, AZStd::make_unique<UmbraOcclusionView>(*this)).second;
+        return m_occlusionViewMap.contains(viewName);
     }
 
-    bool UmbraSceneComponentController::DestroyOcclusionView(const AZ::Name& name)
+    bool UmbraSceneComponentController::CreateOcclusionView(const AZ::Name& viewName)
     {
-        return m_occlusionViewMap.erase(name) != 0;
+        if (!IsSceneReady())
+        {
+            return false;
+        }
+
+        return m_occlusionViewMap.emplace(viewName, AZStd::make_unique<UmbraOcclusionView>(*this)).second;
+    }
+
+    bool UmbraSceneComponentController::DestroyOcclusionView(const AZ::Name& viewName)
+    {
+        return m_occlusionViewMap.erase(viewName) != 0;
     }
 
     bool UmbraSceneComponentController::UpdateOcclusionView(
-        const AZ::Name& name, const AZ::Vector3& cameraWorldPos, const AZ::Matrix4x4& cameraWorldToClip)
+        const AZ::Name& viewName, const AZ::Vector3& cameraWorldPos, const AZ::Matrix4x4& cameraWorldToClip)
     {
-        const auto occlusionViewItr = m_occlusionViewMap.find(name);
+        const auto occlusionViewItr = m_occlusionViewMap.find(viewName);
         return occlusionViewItr != m_occlusionViewMap.end() ? occlusionViewItr->second->Update(cameraWorldPos, cameraWorldToClip) : false;
     }
 
-    bool UmbraSceneComponentController::IsEntityVisibleInOcclusionView(const AZ::Name& name, const AZ::EntityId& entityId) const
+    bool UmbraSceneComponentController::GetOcclusionViewEntityVisibility(const AZ::Name& viewName, const AZ::EntityId& entityId) const
     {
-        const auto occlusionViewItr = m_occlusionViewMap.find(name);
-        return occlusionViewItr != m_occlusionViewMap.end() ? occlusionViewItr->second->IsEntityVisible(entityId) : true;
+        const auto occlusionViewItr = m_occlusionViewMap.find(viewName);
+        return occlusionViewItr != m_occlusionViewMap.end() ? occlusionViewItr->second->GetEntityVisibility(entityId) : true;
     }
 
-    bool UmbraSceneComponentController::IsAabbVisibleInOcclusionView(const AZ::Name& name, const AZ::Aabb& bounds) const
+    bool UmbraSceneComponentController::GetOcclusionViewAabbVisibility(const AZ::Name& viewName, const AZ::Aabb& bounds) const
     {
-        const auto occlusionViewItr = m_occlusionViewMap.find(name);
-        return occlusionViewItr != m_occlusionViewMap.end() ? occlusionViewItr->second->IsAabbVisible(bounds) : true;
+        const auto occlusionViewItr = m_occlusionViewMap.find(viewName);
+        return occlusionViewItr != m_occlusionViewMap.end() ? occlusionViewItr->second->GetAabbVisibility(bounds) : true;
+    }
+
+    AZStd::vector<bool> UmbraSceneComponentController::GetOcclusionViewAabbToAabbVisibility(const AZ::Name& viewName, const AZ::Aabb& sourceAabb, const AZStd::vector<AZ::Aabb>& targetAabbs) const
+    {
+        const auto occlusionViewItr = m_occlusionViewMap.find(viewName);
+        return occlusionViewItr != m_occlusionViewMap.end() ? occlusionViewItr->second->GetAabbToAabbVisibility(sourceAabb, targetAabbs) : AZStd::vector<bool>{};
+    }
+
+    AZStd::vector<bool> UmbraSceneComponentController::GetOcclusionViewSphereToSphereVisibility(const AZ::Name& viewName, const AZ::Sphere& sourceSphere, const AZStd::vector<AZ::Sphere>& targetSpheres) const
+    {
+        const auto occlusionViewItr = m_occlusionViewMap.find(viewName);
+        return occlusionViewItr != m_occlusionViewMap.end() ? occlusionViewItr->second->GetSphereToSphereVisibility(sourceSphere, targetSpheres) : AZStd::vector<bool>{};
+    }
+
+    AZStd::vector<bool> UmbraSceneComponentController::GetOcclusionViewEntityToEntityVisibility(const AZ::Name& viewName, const AZ::EntityId& sourceEntityId, const AZStd::vector<AZ::EntityId>& targetEntityIds) const
+    {
+        const auto occlusionViewItr = m_occlusionViewMap.find(viewName);
+        return occlusionViewItr != m_occlusionViewMap.end() ? occlusionViewItr->second->GetEntityToEntityVisibility(sourceEntityId, targetEntityIds) : AZStd::vector<bool>{};
     }
 
     void UmbraSceneComponentController::DisplayEntityViewport(
@@ -312,7 +396,9 @@ namespace Umbra
     {
         AZ_Assert(m_controller.IsSceneReady(), "Umbra occlusion view cannot be created before scene data is ready.");
 
-        m_query.reset(new Umbra::Query(m_controller.m_tome));
+        m_query.reset(new Umbra::QueryExt(m_controller.m_tome));
+        m_queryWorkMem.resize(m_controller.GetConfiguration().m_additionalMemoryPerQuery);
+        m_query->setWorkMem(m_queryWorkMem.data(), aznumeric_cast<size_t>(m_queryWorkMem.size()));
         m_objectIndexListStorage = AZStd::vector<int32_t>(m_controller.m_tome->getObjectCount());
         m_objectIndexList.reset(new Umbra::IndexList(m_objectIndexListStorage.data(), m_controller.m_tome->getObjectCount()));
         m_occlusionBuffer.reset(new Umbra::OcclusionBuffer());
@@ -384,41 +470,10 @@ namespace Umbra
             flags |= configuration.m_renderDebugStats ? Umbra::Query::VisibilityQueryFlags::DEBUGFLAG_STATISTICS : 0;
         }
 
-        const Umbra::Query::ErrorCode result = m_query->queryPortalVisibility(flags, visibility, camera);
-        switch (result)
+        const Umbra::Query::ErrorCode errorCode = m_query->queryPortalVisibility(flags, visibility, camera);
+        if (errorCode != Umbra::Query::ErrorCode::ERROR_OK)
         {
-        case Umbra::Query::ERROR_OK:
-            break;
-        case Umbra::Query::ERROR_GENERIC_ERROR:
-            AZ_Warning("UmbraSceneComponent", false, "Something completely unexpected happened.");
-            break;
-        case Umbra::Query::ERROR_OUT_OF_MEMORY:
-            AZ_Warning("UmbraSceneComponent", false, "Not enough memory was available in the Query context to perform the operation.");
-            break;
-        case Umbra::Query::ERROR_INVALID_ARGUMENT:
-            AZ_Warning("UmbraSceneComponent", false, "An invalid value was passed into queryPortalVisibility.");
-            break;
-        case Umbra::Query::ERROR_SLOTDATA_UNAVAILABLE:
-            AZ_Warning("UmbraSceneComponent", false, "A tile required to complete the Query was not present in the tome.");
-            break;
-        case Umbra::Query::ERROR_OUTSIDE_SCENE:
-            AZ_Warning("UmbraSceneComponent", false, "A query location was found to be outside of the scene boundaries.");
-            break;
-        case Umbra::Query::ERROR_NO_TOME:
-            AZ_Warning("UmbraSceneComponent", false, "queryPortalVisibility no data was given to the Query.");
-            break;
-        case Umbra::Query::ERROR_NO_PATH:
-            AZ_Warning("UmbraSceneComponent", false, "queryPortalVisibility path does not exist.");
-            break;
-        case Umbra::Query::ERROR_UNSUPPORTED_OPERATION:
-            AZ_Warning("UmbraSceneComponent", false, "queryPortalVisibility operation not supported.");
-            break;
-        case Umbra::Query::ERROR_FEATURE_REQUIRES_BASELEVEL:
-            AZ_Warning("UmbraSceneComponent", false, "Use of query features that don't work with accurate occlusion threshold < FLT_MAX.");
-            break;
-        default:
-            AZ_Warning("UmbraSceneComponent", false, "queryPortalVisibility returned unsupported result value.");
-            break;
+            Internal::PrintQueryErrorMessage(errorCode);
         }
 
         // Add any recorded data for debug lines and stats to the accumulated sets
@@ -429,10 +484,10 @@ namespace Umbra
             m_controller.m_debugStats.insert(m_debugRenderer->m_debugStats.begin(), m_debugRenderer->m_debugStats.end());
         }
 
-        return result == Umbra::Query::ERROR_OK;
+        return errorCode == Umbra::Query::ERROR_OK;
     }
 
-    bool UmbraSceneComponentController::UmbraOcclusionView::IsEntityVisible(const AZ::EntityId& entityId) const
+    bool UmbraSceneComponentController::UmbraOcclusionView::GetEntityVisibility(const AZ::EntityId& entityId) const
     {
         AZ_Assert(m_controller.IsSceneReady(), "Umbra scene component controller and assets must be valid and ready before query.");
         AZ_Assert(m_query, "Umbra query object must be valid before query.");
@@ -463,12 +518,11 @@ namespace Umbra
         }
 
         // The entity being tested is not part of the precomputed occlusion scene. Check its bounding box against the occlusion buffer.
-        AZ::Aabb bounds = AZ::Aabb::CreateNull();
-        AzFramework::BoundsRequestBus::EventResult(bounds, entityId, &AzFramework::BoundsRequestBus::Events::GetWorldBounds);
-        return IsAabbVisible(bounds);
+        const AZ::Aabb bounds = Internal::GetEntityAabb(entityId);
+        return GetAabbVisibility(bounds);
     }
 
-    bool UmbraSceneComponentController::UmbraOcclusionView::IsAabbVisible(const AZ::Aabb& bounds) const
+    bool UmbraSceneComponentController::UmbraOcclusionView::GetAabbVisibility(const AZ::Aabb& bounds) const
     {
         AZ_Assert(m_occlusionBuffer, "Umbra occlusion buffer must be instantiated before query.");
 
@@ -482,5 +536,108 @@ namespace Umbra
         }
  
         return true;
+    }
+
+    AZStd::vector<bool> UmbraSceneComponentController::UmbraOcclusionView::GetAabbToAabbVisibility(const AZ::Aabb& sourceAabb, const AZStd::vector<AZ::Aabb>& targetAabbs) const
+    {
+        AZ_Assert(m_controller.IsSceneReady(), "Umbra scene component controller and assets must be valid and ready before query.");
+        AZ_Assert(m_query, "Umbra query object must be valid before query.");
+
+        if (!m_controller.IsSceneReady() || !m_query || targetAabbs.empty())
+        {
+            return {};
+        }
+
+        // Convert all of the O3DE data types into Umbra data types for the query
+        Umbra::Vector3 sourceMin = {};
+        Umbra::Vector3 sourceMax = {};
+        sourceAabb.GetMin().StoreToFloat3(sourceMin.v);
+        sourceAabb.GetMax().StoreToFloat3(sourceMax.v);
+
+        const int targetCount = aznumeric_cast<int>(targetAabbs.size());
+        AZStd::vector<Umbra::Vector3> targetMin(targetCount, Umbra::Vector3{});
+        AZStd::vector<Umbra::Vector3> targetMax(targetCount, Umbra::Vector3{});
+        for (int i = 0; i < targetCount; ++i)
+        {
+            targetAabbs[i].GetMin().StoreToFloat3(targetMin[i].v);
+            targetAabbs[i].GetMax().StoreToFloat3(targetMax[i].v);
+        }
+
+        // Create a container for all of the intersection results, defaulting all objects to being visible.
+        AZStd::vector<Umbra::QueryExt::IntersectionResult> intersections(targetCount, Umbra::QueryExt::IntersectionResult::IRESULT_NO_INTERSECTION);
+
+        const Umbra::Query::ErrorCode errorCode = m_query->queryAABBVisibility(sourceMin, sourceMax, targetMin.data(), targetMax.data(), targetCount, 0, intersections.data());
+        if (errorCode != Umbra::Query::ErrorCode::ERROR_OK)
+        {
+            Internal::PrintQueryErrorMessage(errorCode);
+            return {};
+        }
+
+        // Convert all of the intersection data into flags, returning true if source and target into these can see each other. 
+        AZStd::vector<bool> results(targetCount, true);
+        for (int i = 0; i < targetCount; ++i)
+        {
+            results[i] = intersections[i] == Umbra::QueryExt::IntersectionResult::IRESULT_NO_INTERSECTION;
+        }
+        return results;
+    }
+
+    AZStd::vector<bool> UmbraSceneComponentController::UmbraOcclusionView::GetSphereToSphereVisibility(const AZ::Sphere& sourceSphere, const AZStd::vector<AZ::Sphere>& targetSpheres) const
+    {
+        AZ_Assert(m_controller.IsSceneReady(), "Umbra scene component controller and assets must be valid and ready before query.");
+        AZ_Assert(m_query, "Umbra query object must be valid before query.");
+
+        if (!m_controller.IsSceneReady() || !m_query || targetSpheres.empty())
+        {
+            return {};
+        }
+
+        // Convert all of the O3DE data types into Umbra data types for the query
+        Umbra::Sphere source = {};
+        sourceSphere.GetCenter().StoreToFloat3(source.center.v);
+        source.radius = sourceSphere.GetRadius();
+
+        const int targetCount = aznumeric_cast<int>(targetSpheres.size());
+        AZStd::vector<Umbra::Sphere> targets(targetCount, Umbra::Sphere{});
+        for (int i = 0; i < targetCount; ++i)
+        {
+            targetSpheres[i].GetCenter().StoreToFloat3(targets[i].center.v);
+            targets[i].radius = targetSpheres[i].GetRadius();
+        }
+
+        // Create a container for all of the intersection results, defaulting all objects to being visible.
+        AZStd::vector<Umbra::QueryExt::IntersectionResult> intersections(targetCount, Umbra::QueryExt::IntersectionResult::IRESULT_NO_INTERSECTION);
+
+        const Umbra::Query::ErrorCode errorCode = m_query->querySphereVisibility(source, targets.data(), targetCount, 0, intersections.data());
+        if (errorCode != Umbra::Query::ErrorCode::ERROR_OK)
+        {
+            Internal::PrintQueryErrorMessage(errorCode);
+            return {};
+        }
+
+        // Convert all of the intersection data into flags, returning true if source and target into these can see each other. 
+        AZStd::vector<bool> results(targetCount, true);
+        for (int i = 0; i < targetCount; ++i)
+        {
+            results[i] = intersections[i] == Umbra::QueryExt::IntersectionResult::IRESULT_NO_INTERSECTION;
+        }
+        return results;
+    }
+
+    AZStd::vector<bool> UmbraSceneComponentController::UmbraOcclusionView::GetEntityToEntityVisibility(const AZ::EntityId& sourceEntityId, const AZStd::vector<AZ::EntityId>& targetEntityIds) const
+    {
+        // Retrieve the world bounding box for the source entity and use it to perform visibility checks against the other entities.
+        const AZ::Aabb sourceAabb = Internal::GetEntityAabb(sourceEntityId);
+
+        const int targetCount = aznumeric_cast<int>(targetEntityIds.size());
+
+        // Retrieve world bounding boxes for all of the target entities to be tested.
+        AZStd::vector<AZ::Aabb> targetAabbs(targetCount, AZ::Aabb::CreateFromPoint(AZ::Vector3::CreateZero()));
+        for (int i = 0; i < targetCount; ++i)
+        {
+            targetAabbs[i] = Internal::GetEntityAabb(targetEntityIds[i]);
+        }
+
+        return GetAabbToAabbVisibility(sourceAabb, targetAabbs);
     }
 } // namespace Umbra

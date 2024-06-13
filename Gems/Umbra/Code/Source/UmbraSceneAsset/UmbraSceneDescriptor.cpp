@@ -33,7 +33,7 @@ namespace Umbra
                     ->ClassElement(AZ::Edit::ClassElements::EditorData, "")
                     ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
                     ->Attribute(AZ::Edit::Attributes::Visibility, AZ::Edit::PropertyVisibility::Show)
-                    ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraSceneDescriptor::m_sceneSettings, "`Scene Settings", "")
+                    ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraSceneDescriptor::m_sceneSettings, "Scene Settings", "")
                     ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraSceneDescriptor::m_sceneSettingsByView, "Scene Settings By View", "")
                     ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraSceneDescriptor::m_objectDescriptors, "Object Descriptors", "")
                     ;

@@ -89,11 +89,24 @@ namespace Umbra
 
     AZ::u32 EditorUmbraSceneComponent::GenerateUmbraScene()
     {
+        // Before prompting the user for a scene file path, initialize it with the level name
+        AZStd::string levelName;
+        AzToolsFramework::EditorRequestBus::BroadcastResult(levelName, &AzToolsFramework::EditorRequestBus::Events::GetLevelName);
+        AZStd::to_lower(levelName.begin(), levelName.end());
+
+        AZStd::string scenePathSeed = AZ::Utils::GetProjectPath().c_str();
+        if (!levelName.empty())
+        {
+            scenePathSeed += "/";
+            scenePathSeed += levelName;
+            scenePathSeed += ".umbrascene";
+        }
+
         // Prompt the user for a path to save the umbra scene
         const AZStd::string scenePath = AzQtComponents::FileDialog::GetSaveFileName(
             AzToolsFramework::GetActiveWindow(),
             QString("Select Umbra Scene File Path"),
-            AZ::Utils::GetProjectPath().c_str(),
+            scenePathSeed.c_str(),
             QString("Umbra Scene (*.umbrascene)"),
             nullptr).toUtf8().constData();
 
@@ -195,7 +208,10 @@ namespace Umbra
                     geometry.m_transform.StoreToRowMajorFloat16(reinterpret_cast<float*>(transform.m));
 
                     // Transparent geometry will automatically be excluded as occluders.
-                    flags &= geometry.m_transparent ? ~Umbra::SceneObject::OCCLUDER : 1;
+                    if (geometry.m_transparent)
+                    {
+                        flags &= ~Umbra::SceneObject::OCCLUDER;
+                    }
 
                     scene->insertObject(model, transform, objectIndex, flags, Umbra::MF_ROW_MAJOR);
 
@@ -217,7 +233,7 @@ namespace Umbra
                     return true;
                 }
 
-                // Use the entity world bounds to determine the balance of the bounding box for the view volume.
+                // Use the entity world bounds to determine the bounding box for the view volume.
                 AZ::Aabb bounds = AZ::Aabb::CreateNull();
                 AzFramework::BoundsRequestBus::EventResult(bounds, entityId, &AzFramework::BoundsRequestBus::Events::GetWorldBounds);
                 if (bounds.IsValid() && bounds.IsFinite())

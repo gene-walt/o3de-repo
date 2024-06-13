@@ -26,7 +26,9 @@ namespace Umbra
                 ->Field("renderDebugStats", &UmbraSceneComponentConfig::m_renderDebugStats)
                 ->Field("sceneSettings", &UmbraSceneComponentConfig::m_sceneSettings)
                 ->Field("sceneAsset", &UmbraSceneComponentConfig::m_sceneAsset)
-                ->Field("exportStaticObjectsOnly", &UmbraSceneComponentConfig::m_exportStaticObjectsOnly);
+                ->Field("exportStaticObjectsOnly", &UmbraSceneComponentConfig::m_exportStaticObjectsOnly)
+                ->Field("additionalMemoryPerQuery", &UmbraSceneComponentConfig::m_additionalMemoryPerQuery)
+                ;
 
             if (auto editContext = serializeContext->GetEditContext())
             {
@@ -35,6 +37,7 @@ namespace Umbra
                     ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
                     ->Attribute(AZ::Edit::Attributes::Visibility, AZ::Edit::PropertyVisibility::Show)
                     ->ClassElement(AZ::Edit::ClassElements::Group, "Debug")
+                    ->Attribute(AZ::Edit::Attributes::AutoExpand, false)
                     ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraSceneComponentConfig::m_pauseDebugInfo, "Pause Debug Info", "Freezes the state of debug rendering and statistics")
                     ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraSceneComponentConfig::m_renderDebugInfo, "Render Debug Info", "Gather and display debug lines and statistics from occlusion queries")
                     ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraSceneComponentConfig::m_renderDebugBounds, "Render Debug Bounds", "When debug rendering is enabled, display bounding boxes for all occlusion objects")
@@ -46,6 +49,9 @@ namespace Umbra
                     ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraSceneComponentConfig::m_sceneSettings, "Scene Settings", "Settings to configure how steam data is processed by the builder")
                     ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraSceneComponentConfig::m_sceneAsset, "Scene Asset", "The scene asset containing precomputed visibility data for occlusion queries")
                     ->DataElement(AZ::Edit::UIHandlers::Default, &UmbraSceneComponentConfig::m_exportStaticObjectsOnly, "Export Static Objects Only", "If enabled, only objects with static transforms will be exported with the umbra scene")
+                    ->DataElement(AZ::Edit::UIHandlers::Slider, &UmbraSceneComponentConfig::m_additionalMemoryPerQuery, "Additional Memory (bytes) Per Query", "Additional working memory (in bytes) reserved for performing extended occlusion queries.")
+                        ->Attribute(AZ::Edit::Attributes::Min, 0)
+                        ->Attribute(AZ::Edit::Attributes::Max, 4000000)
                     ;
             }
         }
@@ -68,6 +74,7 @@ namespace Umbra
                 ->Property("sceneSettings", BehaviorValueProperty(&UmbraSceneComponentConfig::m_sceneSettings))
                 ->Property("sceneAsset", BehaviorValueProperty(&UmbraSceneComponentConfig::m_sceneAsset))
                 ->Property("exportStaticObjectsOnly", BehaviorValueProperty(&UmbraSceneComponentConfig::m_exportStaticObjectsOnly))
+                ->Property("additionalMemoryPerQuery", BehaviorValueProperty(&UmbraSceneComponentConfig::m_additionalMemoryPerQuery))
                 ;
         }
     }
