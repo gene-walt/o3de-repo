@@ -59,7 +59,7 @@ namespace Umbra
 
         //! AzFramework::OcclusionRequestBus::Handler overrides...
         void ClearOcclusionViewDebugInfo() override;
-        bool IsOcclusionView(const AZ::Name& viewName) const override;
+        bool IsOcclusionViewValid(const AZ::Name& viewName) const override;
         bool CreateOcclusionView(const AZ::Name& viewName) override;
         bool DestroyOcclusionView(const AZ::Name& viewName) override;
         bool UpdateOcclusionView(const AZ::Name& viewName, const AZ::Vector3& cameraWorldPos, const AZ::Matrix4x4& cameraWorldToClip) override;

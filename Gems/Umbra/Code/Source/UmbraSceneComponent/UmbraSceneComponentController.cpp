@@ -218,7 +218,7 @@ namespace Umbra
         }
     }
 
-    bool UmbraSceneComponentController::IsOcclusionView(const AZ::Name& viewName) const
+    bool UmbraSceneComponentController::IsOcclusionViewValid(const AZ::Name& viewName) const
     {
         if (!IsSceneReady())
         {
