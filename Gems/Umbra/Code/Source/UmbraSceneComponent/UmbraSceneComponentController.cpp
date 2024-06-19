@@ -51,7 +51,7 @@ namespace Umbra
                 AZ_Warning("UmbraSceneComponent", false, "Use of query features that don't work with accurate occlusion threshold < FLT_MAX.");
                 break;
             default:
-                AZ_Warning("UmbraSceneComponent", false, "queryPortalVisibility returned unsupported result value.");
+                AZ_Warning("UmbraSceneComponent", false, "queryPortalVisibility returned unrecognized error code.");
                 break;
             }
         }
@@ -543,7 +543,13 @@ namespace Umbra
         AZ_Assert(m_controller.IsSceneReady(), "Umbra scene component controller and assets must be valid and ready before query.");
         AZ_Assert(m_query, "Umbra query object must be valid before query.");
 
-        if (!m_controller.IsSceneReady() || !m_query || targetAabbs.empty())
+        if (!m_controller.IsSceneReady() || !m_query)
+        {
+            return {};
+        }
+
+        // Return early if any of the bounding boxes are invalid or there are no target bounding boxes to test
+        if (!sourceAabb.IsValid() || targetAabbs.empty() || !AZStd::all_of(targetAabbs.begin(), targetAabbs.end(), [](const auto& aabb) { return aabb.IsValid(); }))
         {
             return {};
         }
@@ -577,7 +583,7 @@ namespace Umbra
         AZStd::vector<bool> results(targetCount, true);
         for (int i = 0; i < targetCount; ++i)
         {
-            results[i] = intersections[i] == Umbra::QueryExt::IntersectionResult::IRESULT_NO_INTERSECTION;
+            results[i] = (intersections[i] == Umbra::QueryExt::IntersectionResult::IRESULT_NO_INTERSECTION);
         }
         return results;
     }
@@ -619,7 +625,7 @@ namespace Umbra
         AZStd::vector<bool> results(targetCount, true);
         for (int i = 0; i < targetCount; ++i)
         {
-            results[i] = intersections[i] == Umbra::QueryExt::IntersectionResult::IRESULT_NO_INTERSECTION;
+            results[i] = (intersections[i] == Umbra::QueryExt::IntersectionResult::IRESULT_NO_INTERSECTION);
         }
         return results;
     }
