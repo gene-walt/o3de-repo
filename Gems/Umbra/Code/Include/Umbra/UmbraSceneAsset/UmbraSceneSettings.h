@@ -26,6 +26,6 @@ namespace Umbra
 
         float m_collisionRadius = 0.1f;
         float m_smallestHole = 0.1f;
-        float m_smallestOccluder = 0.1f;
+        float m_smallestOccluder = 0.5f;
     };
 } // namespace Umbra

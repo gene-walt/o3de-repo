@@ -63,13 +63,13 @@ namespace Umbra
         bool CreateOcclusionView(const AZ::Name& viewName) override;
         bool DestroyOcclusionView(const AZ::Name& viewName) override;
         bool UpdateOcclusionView(const AZ::Name& viewName, const AZ::Vector3& cameraWorldPos, const AZ::Matrix4x4& cameraWorldToClip) override;
-        bool GetOcclusionViewEntityVisibility(const AZ::Name& viewName, const AZ::EntityId& entityId) const override;
-        bool GetOcclusionViewAabbVisibility(const AZ::Name& viewName, const AZ::Aabb& bounds) const override;
-        AZStd::vector<bool> GetOcclusionViewAabbToAabbVisibility(
+        AzFramework::OcclusionState GetOcclusionViewEntityVisibility(const AZ::Name& viewName, const AZ::EntityId& entityId) const override;
+        AzFramework::OcclusionState GetOcclusionViewAabbVisibility(const AZ::Name& viewName, const AZ::Aabb& bounds) const override;
+        AZStd::vector<AzFramework::OcclusionState> GetOcclusionViewAabbToAabbVisibility(
             const AZ::Name& viewName, const AZ::Aabb& sourceAabb, const AZStd::vector<AZ::Aabb>& targetAabbs) const override;
-        AZStd::vector<bool> GetOcclusionViewSphereToSphereVisibility(
+        AZStd::vector<AzFramework::OcclusionState> GetOcclusionViewSphereToSphereVisibility(
             const AZ::Name& viewName, const AZ::Sphere& sourceSphere, const AZStd::vector<AZ::Sphere>& targetSpheres) const override;
-        AZStd::vector<bool> GetOcclusionViewEntityToEntityVisibility(
+        AZStd::vector<AzFramework::OcclusionState> GetOcclusionViewEntityToEntityVisibility(
             const AZ::Name& viewName, const AZ::EntityId& sourceEntityId, const AZStd::vector<AZ::EntityId>& targetEntityIds) const override;
 
     private:
@@ -96,8 +96,10 @@ namespace Umbra
 
         // This is the runtime version of the precomputed visibility data created from data serialized with the scene asset.
         const Umbra::Tome* m_tome = nullptr;
-        // Container of all entity IDs that contributed to the precomputed visibility data.
-        AZStd::unordered_set<AZ::EntityId> m_occlusionEntities;
+        // Vector of entity IDs, whose indices correspond to object indices in the tome.
+        AZStd::vector<AZ::EntityId> m_objectIndexToEntityIdTable;
+        // Collection of entity ids were referenced in the baked scene data.
+        AZStd::unordered_set<AZ::EntityId> m_storedEntityIds;
 
         // Capturing data for unique line rendering requests. The data is stored as a set of tuples to automatically eliminate duplicates
         // without implementing custom sort and removal logic. Each tuple contains 10 floats, the first four represent rgba color values,
@@ -129,11 +131,11 @@ namespace Umbra
             UmbraOcclusionView(UmbraSceneComponentController& controller);
             ~UmbraOcclusionView();
             bool Update(const AZ::Vector3& cameraWorldPos, const AZ::Matrix4x4& cameraWorldToClip);
-            bool GetEntityVisibility(const AZ::EntityId& entityId) const;
-            bool GetAabbVisibility(const AZ::Aabb& bounds) const;
-            AZStd::vector<bool> GetAabbToAabbVisibility(const AZ::Aabb& sourceAabb, const AZStd::vector<AZ::Aabb>& targetAabbs) const;
-            AZStd::vector<bool> GetSphereToSphereVisibility(const AZ::Sphere& sourceSphere, const AZStd::vector<AZ::Sphere>& targetSpheres) const;
-            AZStd::vector<bool> GetEntityToEntityVisibility(const AZ::EntityId& sourceEntityId, const AZStd::vector<AZ::EntityId>& targetEntityIds) const;
+            AzFramework::OcclusionState GetEntityVisibility(const AZ::EntityId& entityId) const;
+            AzFramework::OcclusionState GetAabbVisibility(const AZ::Aabb& bounds) const;
+            AZStd::vector<AzFramework::OcclusionState> GetAabbToAabbVisibility(const AZ::Aabb& sourceAabb, const AZStd::vector<AZ::Aabb>& targetAabbs) const;
+            AZStd::vector<AzFramework::OcclusionState> GetSphereToSphereVisibility(const AZ::Sphere& sourceSphere, const AZStd::vector<AZ::Sphere>& targetSpheres) const;
+            AZStd::vector<AzFramework::OcclusionState> GetEntityToEntityVisibility(const AZ::EntityId& sourceEntityId, const AZStd::vector<AZ::EntityId>& targetEntityIds) const;
 
         private:
             AZ_DISABLE_COPY(UmbraOcclusionView);
@@ -150,6 +152,8 @@ namespace Umbra
             AZStd::unique_ptr<Umbra::IndexList> m_objectIndexList;
             // Occlusion buffer contains depth data from the previous query to test visibility for dynamic object bounding boxes.
             AZStd::unique_ptr<Umbra::OcclusionBuffer> m_occlusionBuffer;
+            // Collection of into the id is invisible in the last query.
+            AZStd::unordered_set<AZ::EntityId> m_visibleEntityIds;
             // Interfaces with umbra and the query object to gather debug lines and statistics
             AZStd::unique_ptr<UmbraDebugRenderer> m_debugRenderer;
         };

@@ -250,34 +250,34 @@ namespace Umbra
         return occlusionViewItr != m_occlusionViewMap.end() ? occlusionViewItr->second->Update(cameraWorldPos, cameraWorldToClip) : false;
     }
 
-    bool UmbraSceneComponentController::GetOcclusionViewEntityVisibility(const AZ::Name& viewName, const AZ::EntityId& entityId) const
+    AzFramework::OcclusionState UmbraSceneComponentController::GetOcclusionViewEntityVisibility(const AZ::Name& viewName, const AZ::EntityId& entityId) const
     {
         const auto occlusionViewItr = m_occlusionViewMap.find(viewName);
-        return occlusionViewItr != m_occlusionViewMap.end() ? occlusionViewItr->second->GetEntityVisibility(entityId) : true;
+        return occlusionViewItr != m_occlusionViewMap.end() ? occlusionViewItr->second->GetEntityVisibility(entityId) : AzFramework::OcclusionState::Unknown;
     }
 
-    bool UmbraSceneComponentController::GetOcclusionViewAabbVisibility(const AZ::Name& viewName, const AZ::Aabb& bounds) const
+    AzFramework::OcclusionState UmbraSceneComponentController::GetOcclusionViewAabbVisibility(const AZ::Name& viewName, const AZ::Aabb& bounds) const
     {
         const auto occlusionViewItr = m_occlusionViewMap.find(viewName);
-        return occlusionViewItr != m_occlusionViewMap.end() ? occlusionViewItr->second->GetAabbVisibility(bounds) : true;
+        return occlusionViewItr != m_occlusionViewMap.end() ? occlusionViewItr->second->GetAabbVisibility(bounds) : AzFramework::OcclusionState::Unknown;
     }
 
-    AZStd::vector<bool> UmbraSceneComponentController::GetOcclusionViewAabbToAabbVisibility(const AZ::Name& viewName, const AZ::Aabb& sourceAabb, const AZStd::vector<AZ::Aabb>& targetAabbs) const
+    AZStd::vector<AzFramework::OcclusionState> UmbraSceneComponentController::GetOcclusionViewAabbToAabbVisibility(const AZ::Name& viewName, const AZ::Aabb& sourceAabb, const AZStd::vector<AZ::Aabb>& targetAabbs) const
     {
         const auto occlusionViewItr = m_occlusionViewMap.find(viewName);
-        return occlusionViewItr != m_occlusionViewMap.end() ? occlusionViewItr->second->GetAabbToAabbVisibility(sourceAabb, targetAabbs) : AZStd::vector<bool>{};
+        return occlusionViewItr != m_occlusionViewMap.end() ? occlusionViewItr->second->GetAabbToAabbVisibility(sourceAabb, targetAabbs) : AZStd::vector<AzFramework::OcclusionState>{};
     }
 
-    AZStd::vector<bool> UmbraSceneComponentController::GetOcclusionViewSphereToSphereVisibility(const AZ::Name& viewName, const AZ::Sphere& sourceSphere, const AZStd::vector<AZ::Sphere>& targetSpheres) const
+    AZStd::vector<AzFramework::OcclusionState> UmbraSceneComponentController::GetOcclusionViewSphereToSphereVisibility(const AZ::Name& viewName, const AZ::Sphere& sourceSphere, const AZStd::vector<AZ::Sphere>& targetSpheres) const
     {
         const auto occlusionViewItr = m_occlusionViewMap.find(viewName);
-        return occlusionViewItr != m_occlusionViewMap.end() ? occlusionViewItr->second->GetSphereToSphereVisibility(sourceSphere, targetSpheres) : AZStd::vector<bool>{};
+        return occlusionViewItr != m_occlusionViewMap.end() ? occlusionViewItr->second->GetSphereToSphereVisibility(sourceSphere, targetSpheres) : AZStd::vector<AzFramework::OcclusionState>{};
     }
 
-    AZStd::vector<bool> UmbraSceneComponentController::GetOcclusionViewEntityToEntityVisibility(const AZ::Name& viewName, const AZ::EntityId& sourceEntityId, const AZStd::vector<AZ::EntityId>& targetEntityIds) const
+    AZStd::vector<AzFramework::OcclusionState> UmbraSceneComponentController::GetOcclusionViewEntityToEntityVisibility(const AZ::Name& viewName, const AZ::EntityId& sourceEntityId, const AZStd::vector<AZ::EntityId>& targetEntityIds) const
     {
         const auto occlusionViewItr = m_occlusionViewMap.find(viewName);
-        return occlusionViewItr != m_occlusionViewMap.end() ? occlusionViewItr->second->GetEntityToEntityVisibility(sourceEntityId, targetEntityIds) : AZStd::vector<bool>{};
+        return occlusionViewItr != m_occlusionViewMap.end() ? occlusionViewItr->second->GetEntityToEntityVisibility(sourceEntityId, targetEntityIds) : AZStd::vector<AzFramework::OcclusionState>{};
     }
 
     void UmbraSceneComponentController::DisplayEntityViewport(
@@ -357,11 +357,20 @@ namespace Umbra
             // Reserve and build a set of entity IDs stored in the scene asset object descriptor table. This will be used to determine if
             // occlusion tests can be based off of the object index list or if occlusion buffer tests are required.
             m_occlusionViewMap.clear();
-            m_occlusionEntities.clear();
-            m_occlusionEntities.reserve(m_configuration.m_sceneAsset->GetObjectDescriptors().size());
-            for (const auto& objectDesc : m_configuration.m_sceneAsset->GetObjectDescriptors())
+            m_storedEntityIds.clear();
+            m_objectIndexToEntityIdTable.clear();
+            m_objectIndexToEntityIdTable.resize(m_tome->getObjectCount());
+
+            const auto& objectDescs = m_configuration.m_sceneAsset->GetObjectDescriptors();
+            for (int32_t objectIndex = 0; objectIndex < m_tome->getObjectCount(); ++objectIndex)
             {
-                m_occlusionEntities.insert(objectDesc.m_entityId);
+                const uint32_t userIndex = m_tome->getObjectUserID(objectIndex);
+                if (userIndex < objectDescs.size())
+                {
+                    const auto& objectDesc = objectDescs[userIndex];
+                    m_storedEntityIds.insert(objectDesc.m_entityId);
+                    m_objectIndexToEntityIdTable[objectIndex] = objectDesc.m_entityId;
+                }
             }
         }
     }
@@ -369,7 +378,8 @@ namespace Umbra
     void UmbraSceneComponentController::ReleaseScene()
     {
         m_occlusionViewMap.clear();
-        m_occlusionEntities.clear();
+        m_storedEntityIds.clear();
+        m_objectIndexToEntityIdTable.clear();
 
         if (m_tome)
         {
@@ -414,6 +424,7 @@ namespace Umbra
     {
         m_query.reset();
         m_objectIndexList.reset();
+        m_visibleEntityIds.clear();
         m_objectIndexListStorage.clear();
         m_occlusionBuffer.reset();
         m_debugRenderer.reset();
@@ -476,6 +487,21 @@ namespace Umbra
             Internal::PrintQueryErrorMessage(errorCode);
         }
 
+        // Score a container of entity IDs corresponding to visible object indices.
+        m_visibleEntityIds.clear();
+        const int32_t objectIndexListSize = m_objectIndexList->getSize();
+        const int32_t* objectIndexListPtr = m_objectIndexList->getPtr();
+        m_visibleEntityIds.clear();
+        m_visibleEntityIds.reserve(objectIndexListSize);
+        for (int32_t i = 0; i < objectIndexListSize; ++i)
+        {
+            const int32_t objectIndex = objectIndexListPtr[i];
+            if (m_controller.m_objectIndexToEntityIdTable.size() > objectIndex)
+            {
+                m_visibleEntityIds.insert(m_controller.m_objectIndexToEntityIdTable[objectIndex]);
+            }
+        }
+
         // Add any recorded data for debug lines and stats to the accumulated sets
         if (renderDebugInfo)
         {
@@ -487,42 +513,23 @@ namespace Umbra
         return errorCode == Umbra::Query::ERROR_OK;
     }
 
-    bool UmbraSceneComponentController::UmbraOcclusionView::GetEntityVisibility(const AZ::EntityId& entityId) const
+    AzFramework::OcclusionState UmbraSceneComponentController::UmbraOcclusionView::GetEntityVisibility(const AZ::EntityId& entityId) const
     {
         AZ_Assert(m_controller.IsSceneReady(), "Umbra scene component controller and assets must be valid and ready before query.");
         AZ_Assert(m_query, "Umbra query object must be valid before query.");
         AZ_Assert(m_objectIndexList, "Umbra object index list must be valid before query.");
 
-        if (!m_controller.IsSceneReady() || !m_query || !m_objectIndexList)
+        // If the occlusion data or query are not ready or the entity ID is not correspond to one that was recorded with the scene then assume it is not occluded.
+        if (!m_controller.IsSceneReady() || !m_query || !m_objectIndexList || !entityId.IsValid() || !m_controller.m_storedEntityIds.contains(entityId))
         {
-            return true;
+            return AzFramework::OcclusionState::Unknown;
         }
 
-        // If the entity being tested was part of the precomputed visibility data then search for and return its state for the current view.
-        if (m_controller.m_occlusionEntities.contains(entityId))
-        {
-            const auto& objectDescs = m_controller.m_configuration.m_sceneAsset->GetObjectDescriptors();
-            const int32_t objectIndexListSize = m_objectIndexList->getSize();
-            const int32_t* objectIndexListPtr = m_objectIndexList->getPtr();
-            for (int32_t i = 0; i < objectIndexListSize; ++i)
-            {
-                const int32_t objectIndex = objectIndexListPtr[i];
-                const uint32_t userIndex = m_controller.m_tome->getObjectUserID(objectIndex);
-                if (userIndex < objectDescs.size() && objectDescs[userIndex].m_entityId == entityId)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        // The entity being tested is not part of the precomputed occlusion scene. Check its bounding box against the occlusion buffer.
-        const AZ::Aabb bounds = Internal::GetEntityAabb(entityId);
-        return GetAabbVisibility(bounds);
+        // If the entity ID is part of the baked scene data and found in the visible entity ID list then it is visible.
+        return m_visibleEntityIds.contains(entityId) ? AzFramework::OcclusionState::Visible : AzFramework::OcclusionState::Hidden;
     }
 
-    bool UmbraSceneComponentController::UmbraOcclusionView::GetAabbVisibility(const AZ::Aabb& bounds) const
+    AzFramework::OcclusionState UmbraSceneComponentController::UmbraOcclusionView::GetAabbVisibility(const AZ::Aabb& bounds) const
     {
         AZ_Assert(m_occlusionBuffer, "Umbra occlusion buffer must be instantiated before query.");
 
@@ -532,13 +539,13 @@ namespace Umbra
             Umbra::Vector3 max = {};
             bounds.GetMin().StoreToFloat3(min.v);
             bounds.GetMax().StoreToFloat3(max.v);
-            return m_occlusionBuffer->isAABBVisible(min, max);
+            return m_occlusionBuffer->isAABBVisible(min, max) ? AzFramework::OcclusionState::Visible : AzFramework::OcclusionState::Hidden;
         }
- 
-        return true;
+
+        return AzFramework::OcclusionState::Unknown;
     }
 
-    AZStd::vector<bool> UmbraSceneComponentController::UmbraOcclusionView::GetAabbToAabbVisibility(const AZ::Aabb& sourceAabb, const AZStd::vector<AZ::Aabb>& targetAabbs) const
+    AZStd::vector<AzFramework::OcclusionState> UmbraSceneComponentController::UmbraOcclusionView::GetAabbToAabbVisibility(const AZ::Aabb& sourceAabb, const AZStd::vector<AZ::Aabb>& targetAabbs) const
     {
         AZ_Assert(m_controller.IsSceneReady(), "Umbra scene component controller and assets must be valid and ready before query.");
         AZ_Assert(m_query, "Umbra query object must be valid before query.");
@@ -580,15 +587,26 @@ namespace Umbra
         }
 
         // Convert all of the intersection data into flags, returning true if source and target into these can see each other. 
-        AZStd::vector<bool> results(targetCount, true);
+        AZStd::vector<AzFramework::OcclusionState> results(targetCount, AzFramework::OcclusionState::Unknown);
         for (int i = 0; i < targetCount; ++i)
         {
-            results[i] = (intersections[i] == Umbra::QueryExt::IntersectionResult::IRESULT_NO_INTERSECTION);
+            switch (intersections[i])
+            {
+            case Umbra::QueryExt::IntersectionResult::IRESULT_INTERSECTION:
+                results[i] = AzFramework::OcclusionState::Hidden;
+                break;
+            case Umbra::QueryExt::IntersectionResult::IRESULT_NO_INTERSECTION:
+                results[i] = AzFramework::OcclusionState::Visible;
+                break;
+            default:
+                results[i] = AzFramework::OcclusionState::Unknown;
+                break;
+            }
         }
         return results;
     }
 
-    AZStd::vector<bool> UmbraSceneComponentController::UmbraOcclusionView::GetSphereToSphereVisibility(const AZ::Sphere& sourceSphere, const AZStd::vector<AZ::Sphere>& targetSpheres) const
+    AZStd::vector<AzFramework::OcclusionState> UmbraSceneComponentController::UmbraOcclusionView::GetSphereToSphereVisibility(const AZ::Sphere& sourceSphere, const AZStd::vector<AZ::Sphere>& targetSpheres) const
     {
         AZ_Assert(m_controller.IsSceneReady(), "Umbra scene component controller and assets must be valid and ready before query.");
         AZ_Assert(m_query, "Umbra query object must be valid before query.");
@@ -622,15 +640,26 @@ namespace Umbra
         }
 
         // Convert all of the intersection data into flags, returning true if source and target into these can see each other. 
-        AZStd::vector<bool> results(targetCount, true);
+        AZStd::vector<AzFramework::OcclusionState> results(targetCount, AzFramework::OcclusionState::Unknown);
         for (int i = 0; i < targetCount; ++i)
         {
-            results[i] = (intersections[i] == Umbra::QueryExt::IntersectionResult::IRESULT_NO_INTERSECTION);
+            switch (intersections[i])
+            {
+            case Umbra::QueryExt::IntersectionResult::IRESULT_INTERSECTION:
+                results[i] = AzFramework::OcclusionState::Hidden;
+                break;
+            case Umbra::QueryExt::IntersectionResult::IRESULT_NO_INTERSECTION:
+                results[i] = AzFramework::OcclusionState::Visible;
+                break;
+            default:
+                results[i] = AzFramework::OcclusionState::Unknown;
+                break;
+            }
         }
         return results;
     }
 
-    AZStd::vector<bool> UmbraSceneComponentController::UmbraOcclusionView::GetEntityToEntityVisibility(const AZ::EntityId& sourceEntityId, const AZStd::vector<AZ::EntityId>& targetEntityIds) const
+    AZStd::vector<AzFramework::OcclusionState> UmbraSceneComponentController::UmbraOcclusionView::GetEntityToEntityVisibility(const AZ::EntityId& sourceEntityId, const AZStd::vector<AZ::EntityId>& targetEntityIds) const
     {
         // Retrieve the world bounding box for the source entity and use it to perform visibility checks against the other entities.
         const AZ::Aabb sourceAabb = Internal::GetEntityAabb(sourceEntityId);
