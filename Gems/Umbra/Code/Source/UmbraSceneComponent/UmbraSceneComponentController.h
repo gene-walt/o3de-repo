@@ -152,7 +152,7 @@ namespace Umbra
             AZStd::unique_ptr<Umbra::IndexList> m_objectIndexList;
             // Occlusion buffer contains depth data from the previous query to test visibility for dynamic object bounding boxes.
             AZStd::unique_ptr<Umbra::OcclusionBuffer> m_occlusionBuffer;
-            // Collection of entity id is invisible in the last query.
+            // Collection of entity IDs visible since the last query.
             AZStd::unordered_set<AZ::EntityId> m_visibleEntityIds;
             // Interfaces with umbra and the query object to gather debug lines and statistics
             AZStd::unique_ptr<UmbraDebugRenderer> m_debugRenderer;

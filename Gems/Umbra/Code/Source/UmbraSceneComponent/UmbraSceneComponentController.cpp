@@ -487,7 +487,7 @@ namespace Umbra
             Internal::PrintQueryErrorMessage(errorCode);
         }
 
-        // Score a container of entity IDs corresponding to visible object indices.
+        // Store a container of entity IDs corresponding to visible object indices.
         m_visibleEntityIds.clear();
         const int32_t objectIndexListSize = m_objectIndexList->getSize();
         const int32_t* objectIndexListPtr = m_objectIndexList->getPtr();
