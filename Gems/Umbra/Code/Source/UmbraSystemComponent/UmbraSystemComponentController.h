@@ -38,7 +38,7 @@ namespace Umbra
         //! UmbraSystemComponentRequestBus overrides...
 
     private:
-        AZ_DISABLE_COPY(UmbraSystemComponentController);
+        AZ_DISABLE_COPY_MOVE(UmbraSystemComponentController);
 
         AZ::EntityId m_entityId;
         UmbraSystemComponentConfig m_configuration;

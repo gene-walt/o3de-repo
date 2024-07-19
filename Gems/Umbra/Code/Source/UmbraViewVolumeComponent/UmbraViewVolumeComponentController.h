@@ -41,7 +41,7 @@ namespace Umbra
         const UmbraSceneSettings& GetSceneSettings() const;
 
     private:
-        AZ_DISABLE_COPY(UmbraViewVolumeComponentController);
+        AZ_DISABLE_COPY_MOVE(UmbraViewVolumeComponentController);
 
         AZ::EntityId m_entityId;
         UmbraViewVolumeComponentConfig m_configuration;

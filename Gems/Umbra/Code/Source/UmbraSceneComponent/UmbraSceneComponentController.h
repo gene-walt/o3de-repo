@@ -73,7 +73,7 @@ namespace Umbra
             const AZ::Name& viewName, const AZ::EntityId& sourceEntityId, const AZStd::vector<AZ::EntityId>& targetEntityIds) const override;
 
     private:
-        AZ_DISABLE_COPY(UmbraSceneComponentController);
+        AZ_DISABLE_COPY_MOVE(UmbraSceneComponentController);
 
         //! AzFramework::DebugDisplayRequestBus::Handler overrides...
         void DisplayEntityViewport(const AzFramework::ViewportInfo& viewportInfo, AzFramework::DebugDisplayRequests& debugDisplay) override;
@@ -138,7 +138,7 @@ namespace Umbra
             AZStd::vector<AzFramework::OcclusionState> GetEntityToEntityVisibility(const AZ::EntityId& sourceEntityId, const AZStd::vector<AZ::EntityId>& targetEntityIds) const;
 
         private:
-            AZ_DISABLE_COPY(UmbraOcclusionView);
+            AZ_DISABLE_COPY_MOVE(UmbraOcclusionView);
 
             // Reference to controller to access tome, assets, and debug containers
             UmbraSceneComponentController& m_controller;

@@ -40,7 +40,7 @@ namespace Umbra
         bool GetCanBeOccluded() const override;
 
     private:
-        AZ_DISABLE_COPY(UmbraObjectComponentController);
+        AZ_DISABLE_COPY_MOVE(UmbraObjectComponentController);
 
         AZ::EntityId m_entityId;
         UmbraObjectComponentConfig m_configuration;
