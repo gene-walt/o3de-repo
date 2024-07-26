@@ -12,13 +12,13 @@
 o3de_pal_dir(pal_dir ${CMAKE_CURRENT_LIST_DIR}/Platform/${PAL_PLATFORM_NAME} "${gem_restricted_path}" "${gem_path}" "${gem_parent_relative_path}")
 
 # Umbra Install Path
-set(LY_UMBRA_INSTALL_PATH "" CACHE PATH "Path to Umbra installation.")
+set(UMBRA_SDK_PATH "" CACHE PATH "Path to Umbra installation.")
 
 # Paths that will be checked, in order:
 # - CMake cache variable
 # - UMBRA_SDK_PATH Environment Variable
 set(UMBRA_SDK_PATHS
-    "${LY_UMBRA_INSTALL_PATH}"
+    "${UMBRA_SDK_PATH}"
     "$ENV{UMBRA_SDK_PATH}"
 )
 
@@ -27,7 +27,7 @@ foreach(candidate_path ${UMBRA_SDK_PATHS})
     if(EXISTS ${candidate_path}/LICENSE.txt)
         # Update the Umbra Install Path variable internally
         set(found_sdk TRUE)
-        set(LY_UMBRA_INSTALL_PATH "${candidate_path}")
+        set(UMBRA_SDK_PATH "${candidate_path}")
         break()
     endif()
 endforeach()
@@ -49,7 +49,7 @@ if(NOT PAL_TRAIT_UMBRA_SUPPORTED)
 endif()
 
 # this file actually ingests the library and defines targets.
-if (TARGET ${O3DE_UMBRA_TARGET})
+if (TARGET ${UMBRA_TARGET})
     return()
 endif()
 
@@ -61,16 +61,16 @@ set(UMBRA_STATIC_LIBRARIES
     "$<$<CONFIG:release>:${UMBRA_STATIC_LIBRARIES_RELEASE}>"
     "$<$<CONFIG:debug>:${UMBRA_STATIC_LIBRARIES_DEBUG}>")
 
-add_library(${O3DE_UMBRA_TARGET} INTERFACE IMPORTED GLOBAL)
+add_library(${UMBRA_TARGET} INTERFACE IMPORTED GLOBAL)
 
-ly_target_include_system_directories(TARGET ${O3DE_UMBRA_TARGET} INTERFACE ${LY_UMBRA_INSTALL_PATH}/interface)
+ly_target_include_system_directories(TARGET ${UMBRA_TARGET} INTERFACE ${UMBRA_SDK_PATH}/interface)
 
 if(DEFINED UMBRA_STATIC_LIBRARIES)
-    target_link_libraries(${O3DE_UMBRA_TARGET} INTERFACE ${UMBRA_STATIC_LIBRARIES})
+    target_link_libraries(${UMBRA_TARGET} INTERFACE ${UMBRA_STATIC_LIBRARIES})
 endif()
 
 if(DEFINED UMBRA_RUNTIME_DEPENDENCIES)
-    ly_add_target_files(TARGETS ${O3DE_UMBRA_TARGET} FILES ${UMBRA_RUNTIME_DEPENDENCIES})
+    ly_add_target_files(TARGETS ${UMBRA_TARGET} FILES ${UMBRA_RUNTIME_DEPENDENCIES})
 endif()
 
 # The ${gem_name}.API target declares the common interface that users of this gem should depend on in their targets
@@ -114,7 +114,7 @@ ly_add_target(
             Gem::Atom_Utils.Static
             Gem::Atom_Feature_Common
             Gem::AtomLyIntegration_CommonFeatures.Static
-            ${O3DE_UMBRA_TARGET}
+            ${UMBRA_TARGET}
 )
 
 # Here add ${gem_name} target, it depends on the Private Object library and Public API interface
@@ -191,7 +191,7 @@ if(PAL_TRAIT_BUILD_HOST_TOOLS)
                 Gem::Atom_Utils.Static
                 Gem::Atom_Feature_Common.Static
                 Gem::AtomLyIntegration_CommonFeatures.Static
-                ${O3DE_UMBRA_TARGET}
+                ${UMBRA_TARGET}
     )
 
     ly_add_target(
