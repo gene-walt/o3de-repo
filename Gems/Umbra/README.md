@@ -9,7 +9,7 @@ The Umbra Gem integrates the Umbra SDK with O3DE. The gem interfaces with the O3
 
 ### 1. Install the Umbra SDK
 
-To use the Umbra Gem, you must obtain the Umbra SDK and a valid license from https://umbra3d.com/. Unzip the SDK package into a local folder. If building from source, refer to the SDK instructions to build binaries for your target platforms. Targeting non standard or new platforms may require updating CMake in the gem to link the correct libraries.
+To use the Umbra Gem, you must obtain the Umbra SDK and a valid license from the [Umbra website](https://www.umbra3d.com). Unzip the SDK package into a local folder. If building from source, refer to the SDK instructions to build binaries for your target platforms. Targeting non standard or new platforms may require updating CMake in the gem to link the correct libraries.
 
 ### 2. Install the Umbra Gem
 
