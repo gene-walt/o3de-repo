@@ -18,8 +18,8 @@ set(UMBRA_SDK_PATH "" CACHE PATH "Path to Umbra installation.")
 # - CMake cache variable
 # - UMBRA_SDK_PATH Environment Variable
 set(UMBRA_SDK_PATHS
-    "${UMBRA_SDK_PATH}"
     "$ENV{UMBRA_SDK_PATH}"
+    "${UMBRA_SDK_PATH}"
 )
 
 set(found_sdk FALSE)
