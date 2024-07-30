@@ -14,7 +14,7 @@
 namespace Umbra
 {
     //! This registers asset handlers and other data types needed in runtime and editor.
-    class UmbraSystemComponentController final : UmbraSystemComponentRequestBus::Handler
+    class UmbraSystemComponentController final : public UmbraSystemComponentRequestBus::Handler
     {
     public:
         friend class EditorUmbraSystemComponent;

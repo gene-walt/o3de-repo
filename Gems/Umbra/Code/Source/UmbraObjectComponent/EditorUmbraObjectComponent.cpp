@@ -24,14 +24,14 @@ namespace Umbra
             if (auto editContext = serializeContext->GetEditContext())
             {
                 editContext->Class<EditorUmbraObjectComponent>(
-                    "Umbra Object", "")
+                    "Umbra Object", "This optional component can override occlusion culling parameters on entities that contribute to Umbra scene geometry.")
                     ->ClassElement(AZ::Edit::ClassElements::EditorData, "")
                         ->Attribute(AZ::Edit::Attributes::Category, "Umbra")
                         ->Attribute(AZ::Edit::Attributes::Icon, "Icons/Components/Component_Placeholder.svg")
                         ->Attribute(AZ::Edit::Attributes::ViewportIcon, "Icons/Components/Viewport/Component_Placeholder.svg")
                         ->Attribute(AZ::Edit::Attributes::AppearsInAddComponentMenu, AZ_CRC_CE("Game"))
                         ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
-                        ->Attribute(AZ::Edit::Attributes::HelpPageURL, "")
+                        ->Attribute(AZ::Edit::Attributes::HelpPageURL, "https://umbra3d.com/")
                     ;
             }
         }
@@ -53,12 +53,10 @@ namespace Umbra
     void EditorUmbraObjectComponent::Activate()
     {
         BaseClass::Activate();
-        UmbraObjectComponentNotificationBus::Handler::BusConnect(GetEntityId());
     }
 
     void EditorUmbraObjectComponent::Deactivate()
     {
-        UmbraObjectComponentNotificationBus::Handler::BusDisconnect();
         BaseClass::Deactivate();
     }
 } // namespace Umbra

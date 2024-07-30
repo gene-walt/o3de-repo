@@ -13,7 +13,7 @@ namespace Umbra
 {
     //! Manages any common functionality between runtime and editor components for umbra view volumes. This may be responsible for rendering
     //! debug data.
-    class UmbraViewVolumeComponentController final : UmbraViewVolumeComponentRequestBus::Handler
+    class UmbraViewVolumeComponentController final : public UmbraViewVolumeComponentRequestBus::Handler
     {
     public:
         friend class EditorUmbraViewVolumeComponent;

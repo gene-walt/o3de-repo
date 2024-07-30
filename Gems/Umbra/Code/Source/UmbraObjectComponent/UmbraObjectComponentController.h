@@ -12,7 +12,7 @@
 namespace Umbra
 {
     //! Implements common functionality for umbra object run time and editor components.
-    class UmbraObjectComponentController final : UmbraObjectComponentRequestBus::Handler
+    class UmbraObjectComponentController final : public UmbraObjectComponentRequestBus::Handler
     {
     public:
         friend class EditorUmbraObjectComponent;

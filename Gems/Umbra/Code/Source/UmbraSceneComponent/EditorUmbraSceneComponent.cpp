@@ -43,19 +43,19 @@ namespace Umbra
             if (auto editContext = serializeContext->GetEditContext())
             {
                 editContext->Class<EditorUmbraSceneComponent>(
-                    "Umbra Scene", "")
+                    "Umbra Scene", "This level component allows exporting scene geometry and managing occlusion culling requests with Umbra.")
                     ->ClassElement(AZ::Edit::ClassElements::EditorData, "")
                         ->Attribute(AZ::Edit::Attributes::Category, "Umbra")
                         ->Attribute(AZ::Edit::Attributes::Icon, "Icons/Components/Component_Placeholder.svg")
                         ->Attribute(AZ::Edit::Attributes::ViewportIcon, "Icons/Components/Viewport/Component_Placeholder.svg")
                         ->Attribute(AZ::Edit::Attributes::AppearsInAddComponentMenu, AZ_CRC_CE("Level"))
                         ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
-                        ->Attribute(AZ::Edit::Attributes::HelpPageURL, "")
+                        ->Attribute(AZ::Edit::Attributes::HelpPageURL, "https://umbra3d.com/")
                         ->Attribute(AZ::Edit::Attributes::PrimaryAssetType, AZ::AzTypeInfo<Umbra::UmbraSceneAsset>::Uuid())
-                        ->UIElement(AZ::Edit::UIHandlers::Button, GenerateUmbraSceneButtonText, GenerateUmbraSceneToolTipText)
+                        ->UIElement(AZ::Edit::UIHandlers::Button, ExportUmbraSceneButtonText, ExportUmbraSceneToolTipText)
                             ->Attribute(AZ::Edit::Attributes::NameLabelOverride, "")
-                            ->Attribute(AZ::Edit::Attributes::ButtonText, GenerateUmbraSceneButtonText)
-                            ->Attribute(AZ::Edit::Attributes::ChangeNotify, &EditorUmbraSceneComponent::GenerateUmbraScene)
+                            ->Attribute(AZ::Edit::Attributes::ButtonText, ExportUmbraSceneButtonText)
+                            ->Attribute(AZ::Edit::Attributes::ChangeNotify, &EditorUmbraSceneComponent::ExportUmbraSceneFromUI)
                     ;
             }
         }
@@ -65,6 +65,14 @@ namespace Umbra
             behaviorContext->ConstantProperty("EditorUmbraSceneComponentTypeId", BehaviorConstant(AZ::Uuid(EditorUmbraSceneComponentTypeId)))
                 ->Attribute(AZ::Script::Attributes::Module, "umbra")
                 ->Attribute(AZ::Script::Attributes::Scope, AZ::Script::Attributes::ScopeFlags::Automation)
+                ;
+
+            behaviorContext->EBus<EditorUmbraSceneComponentRequestBus>("EditorUmbraSceneComponentRequestBus")
+                ->Attribute(AZ::Script::Attributes::Scope, AZ::Script::Attributes::ScopeFlags::Common)
+                ->Attribute(AZ::Script::Attributes::Category, "umbra")
+                ->Attribute(AZ::Script::Attributes::Module, "umbra")
+                ->Event("ExportUmbraScene", &EditorUmbraSceneComponentRequestBus::Events::ExportUmbraScene)
+                ->Event("ShouldExportEntity", &EditorUmbraSceneComponentRequestBus::Events::ShouldExportEntity)
                 ;
         }
     }
@@ -77,17 +85,17 @@ namespace Umbra
     void EditorUmbraSceneComponent::Activate()
     {
         BaseClass::Activate();
-        UmbraSceneComponentNotificationBus::Handler::BusConnect(GetEntityId());
+        EditorUmbraSceneComponentRequestBus::Handler::BusConnect(GetEntityId());
         m_contextId = GetEntityContextId(GetEntityId());
     }
 
     void EditorUmbraSceneComponent::Deactivate()
     {
-        UmbraSceneComponentNotificationBus::Handler::BusDisconnect();
+        EditorUmbraSceneComponentRequestBus::Handler::BusDisconnect();
         BaseClass::Deactivate();
     }
 
-    AZ::u32 EditorUmbraSceneComponent::GenerateUmbraScene()
+    AZ::u32 EditorUmbraSceneComponent::ExportUmbraSceneFromUI()
     {
         // Before prompting the user for a scene file path, initialize it with the level name
         AZStd::string levelName;
@@ -112,7 +120,7 @@ namespace Umbra
 
         if (!scenePath.empty())
         {
-            if (!GenerateUmbraSceneFromLevel(scenePath))
+            if (!ExportUmbraScene(scenePath))
             {
                 QMessageBox::critical(
                     AzToolsFramework::GetActiveWindow(),
@@ -152,7 +160,7 @@ namespace Umbra
         return AZ::Edit::PropertyRefreshLevels::EntireTree;
     }
 
-    bool EditorUmbraSceneComponent::GenerateUmbraSceneFromLevel(const AZStd::string& scenePath) const
+    bool EditorUmbraSceneComponent::ExportUmbraScene(const AZStd::string& scenePath) const
     {
         if (scenePath.empty() || AZ::StringFunc::Path::IsRelative(scenePath.c_str()) ||
             !AZ::StringFunc::Path::IsExtension(scenePath.c_str(), "umbrascene"))

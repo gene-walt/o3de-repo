@@ -25,10 +25,10 @@ namespace Umbra
     //! entity visibility checks will do simple AABB tests against the occlusion buffer. This class implements OcclusionRequestBus and
     //! supports creating multiple occlusion views from different perspectives and parallel occlusion queries.
     class UmbraSceneComponentController final
-        : UmbraSceneComponentRequestBus::Handler
-        , AzFramework::OcclusionRequestBus::Handler
-        , AzFramework::EntityDebugDisplayEventBus::Handler
-        , AZ::Data::AssetBus::Handler
+        : public UmbraSceneComponentRequestBus::Handler
+        , public AzFramework::OcclusionRequestBus::Handler
+        , public AzFramework::EntityDebugDisplayEventBus::Handler
+        , public AZ::Data::AssetBus::Handler
     {
     public:
         friend class EditorUmbraSceneComponent;

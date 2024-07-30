@@ -6,7 +6,6 @@
 #pragma once
 
 #include <AzToolsFramework/ToolsComponents/EditorComponentAdapter.h>
-#include <Umbra/UmbraSystemComponent/UmbraSystemComponentBus.h>
 #include <Umbra/UmbraSystemComponent/UmbraSystemComponentConstants.h>
 #include <UmbraSystemComponent/UmbraSystemComponent.h>
 
@@ -15,7 +14,6 @@ namespace Umbra
     //! Managers editor only reflection of system level data types for the gem.
     class EditorUmbraSystemComponent final
         : public AzToolsFramework::Components::EditorComponentAdapter<UmbraSystemComponentController, UmbraSystemComponent, UmbraSystemComponentConfig>
-        , public UmbraSystemComponentNotificationBus::Handler
     {
     public:
         using BaseClass = AzToolsFramework::Components::EditorComponentAdapter<UmbraSystemComponentController, UmbraSystemComponent, UmbraSystemComponentConfig>;

@@ -4,4 +4,5 @@
 #
 
 set(FILES
+    Include/Umbra/UmbraSceneComponent/EditorUmbraSceneComponentBus.h
 )

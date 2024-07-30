@@ -26,14 +26,14 @@ namespace Umbra
             if (auto editContext = serializeContext->GetEditContext())
             {
                 editContext->Class<EditorUmbraSystemComponent>(
-                    "Umbra System", "")
+                    "Umbra System", "This system component reflects Umbra data types.")
                     ->ClassElement(AZ::Edit::ClassElements::EditorData, "")
                         ->Attribute(AZ::Edit::Attributes::Category, "Umbra")
                         ->Attribute(AZ::Edit::Attributes::Icon, "Icons/Components/Component_Placeholder.svg")
                         ->Attribute(AZ::Edit::Attributes::ViewportIcon, "Icons/Components/Viewport/Component_Placeholder.svg")
                         ->Attribute(AZ::Edit::Attributes::AppearsInAddComponentMenu, AZ_CRC_CE("System"))
                         ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
-                        ->Attribute(AZ::Edit::Attributes::HelpPageURL, "")
+                        ->Attribute(AZ::Edit::Attributes::HelpPageURL, "https://umbra3d.com/")
                         ->Attribute(AZ::Edit::Attributes::PrimaryAssetType, AZ::AzTypeInfo<Umbra::UmbraSceneAsset>::Uuid())
                     ;
             }
@@ -56,12 +56,10 @@ namespace Umbra
     void EditorUmbraSystemComponent::Activate()
     {
         BaseClass::Activate();
-        UmbraSystemComponentNotificationBus::Handler::BusConnect(GetEntityId());
     }
 
     void EditorUmbraSystemComponent::Deactivate()
     {
-        UmbraSystemComponentNotificationBus::Handler::BusDisconnect();
         BaseClass::Deactivate();
     }
 } // namespace Umbra

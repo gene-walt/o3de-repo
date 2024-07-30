@@ -6,7 +6,6 @@
 #pragma once
 
 #include <AzToolsFramework/ToolsComponents/EditorComponentAdapter.h>
-#include <Umbra/UmbraObjectComponent/UmbraObjectComponentBus.h>
 #include <Umbra/UmbraObjectComponent/UmbraObjectComponentConstants.h>
 #include <UmbraObjectComponent/UmbraObjectComponent.h>
 
@@ -15,7 +14,6 @@ namespace Umbra
     //! EditorUmbraObjectComponent extends the corresponding component and controller with edit contexts and other editor specific features.
     class EditorUmbraObjectComponent final
         : public AzToolsFramework::Components::EditorComponentAdapter<UmbraObjectComponentController, UmbraObjectComponent, UmbraObjectComponentConfig>
-        , public UmbraObjectComponentNotificationBus::Handler
     {
     public:
         using BaseClass = AzToolsFramework::Components::EditorComponentAdapter<UmbraObjectComponentController, UmbraObjectComponent, UmbraObjectComponentConfig>;

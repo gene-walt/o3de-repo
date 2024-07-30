@@ -25,11 +25,13 @@ The Umbra gem includes components to setup Umbra in O3DE.
 
 ### The Umbra Scene Component
 
-The Umbra Scene Component is the primary component. This component must be added to the root entity for it any level using Umbra occlusion culling. It has properties to configure what objects are exported with the scene, where the scene data is saved, how scene data is processed, and what debug data is visualized.
+The Umbra Scene Component must be added to the root entity of any level using Umbra occlusion culling. It has properties to configure what objects are exported with the scene, where the scene data is saved, how scene data is processed, and what debug data is visualized.
 
-Use it in the editor to export a level's scene geometry. By default, only geometry on static entities will be exported. The asset processor uses the Umbra optimizer to compute visibility data from the exported scene geometry. The visibility data will be saved as an asset and automatically loaded for the Umbra runtime to determine object visibility.
+Use the component in the editor to export a level's scene geometry whenever occlusion data needs to be updated. By default, only geometry on static entities will be exported but the component has settings to configure this behavior. The asset processor uses the Umbra optimizer to compute visibility data from the exported scene geometry. The visibility data will be saved as an asset and automatically loaded for the Umbra runtime to determine object visibility during queries.
 
-The Umbra Scene Component implements AzFramework::OcclusionRequestBus, which can be used to service occlusion queries and other requests throughout the engine. The Atom renderer will automatically perform occlusion culling via this bus if the component is active and data is loaded.
+The scene export process gathers geometry from systems and components that implement AzFramework::VisibleGeometryRequestBus. Currently, only a few components, like the Mesh Component, implement this bus and contribute to the scene geometry. Other components, like shapes and terrain, can easily be extended with AzFramework::VisibleGeometryRequestBus to include their geometry. 
+
+The Umbra Scene Component implements AzFramework::OcclusionRequestBus, which can be used to service occlusion queries and other requests throughout the engine. The Atom renderer will automatically perform per-view occlusion culling via this bus if the component is active and data is loaded.
 
 ### The Umbra Object Component
 
