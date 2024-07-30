@@ -97,7 +97,7 @@ namespace Umbra
         {
             behaviorContext->EBus<UmbraSceneComponentRequestBus>("UmbraSceneComponentRequestBus")
                 ->Attribute(AZ::Script::Attributes::Scope, AZ::Script::Attributes::ScopeFlags::Common)
-                ->Attribute(AZ::Script::Attributes::Category, "umbra")
+                ->Attribute(AZ::Script::Attributes::Category, "Umbra")
                 ->Attribute(AZ::Script::Attributes::Module, "umbra")
                 ->Event("SetSceneAsset", &UmbraSceneComponentRequestBus::Events::SetSceneAsset)
                 ->Event("SetSceneAssetId", &UmbraSceneComponentRequestBus::Events::SetSceneAssetId)

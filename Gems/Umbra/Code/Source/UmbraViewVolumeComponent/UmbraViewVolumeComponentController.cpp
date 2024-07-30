@@ -36,7 +36,7 @@ namespace Umbra
         {
             behaviorContext->EBus<UmbraViewVolumeComponentRequestBus>("UmbraViewVolumeComponentRequestBus")
                 ->Attribute(AZ::Script::Attributes::Scope, AZ::Script::Attributes::ScopeFlags::Common)
-                ->Attribute(AZ::Script::Attributes::Category, "umbra")
+                ->Attribute(AZ::Script::Attributes::Category, "Umbra")
                 ->Attribute(AZ::Script::Attributes::Module, "umbra")
                 ;
         }

@@ -42,6 +42,6 @@ namespace Umbra
         AzFramework::EntityContextId m_contextId = AzFramework::EntityContextId::CreateNull();
 
         static constexpr const char* ExportUmbraSceneButtonText = "Export Umbra Scene...";
-        static constexpr const char* ExportUmbraSceneToolTipText = "Export and save an umbra scene from level entities.";
+        static constexpr const char* ExportUmbraSceneToolTipText = "Export and save an Umbra scene from level entities.";
     };
 } // namespace Umbra

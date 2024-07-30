@@ -69,7 +69,7 @@ namespace Umbra
 
             behaviorContext->EBus<EditorUmbraSceneComponentRequestBus>("EditorUmbraSceneComponentRequestBus")
                 ->Attribute(AZ::Script::Attributes::Scope, AZ::Script::Attributes::ScopeFlags::Common)
-                ->Attribute(AZ::Script::Attributes::Category, "umbra")
+                ->Attribute(AZ::Script::Attributes::Category, "Umbra")
                 ->Attribute(AZ::Script::Attributes::Module, "umbra")
                 ->Event("ExportUmbraScene", &EditorUmbraSceneComponentRequestBus::Events::ExportUmbraScene)
                 ->Event("ShouldExportEntity", &EditorUmbraSceneComponentRequestBus::Events::ShouldExportEntity)

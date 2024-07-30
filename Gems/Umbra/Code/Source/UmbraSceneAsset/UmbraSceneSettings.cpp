@@ -54,7 +54,7 @@ namespace Umbra
         {
             behaviorContext->Class<UmbraSceneSettings>("UmbraSceneSettings")
                 ->Attribute(AZ::Script::Attributes::Scope, AZ::Script::Attributes::ScopeFlags::Common)
-                ->Attribute(AZ::Script::Attributes::Category, "umbra")
+                ->Attribute(AZ::Script::Attributes::Category, "Umbra")
                 ->Attribute(AZ::Script::Attributes::Module, "umbra")
                 ->Constructor()
                 ->Constructor<const UmbraSceneSettings&>()
