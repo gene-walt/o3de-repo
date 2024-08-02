@@ -2,12 +2,12 @@
     "gem_name": "Umbra",
     "version": "1.0.0",
     "display_name": "Umbra",
-    "license": "License used i.e. Apache-2.0 or MIT",
-    "license_url": "Link to the license web site i.e. https://opensource.org/licenses/Apache-2.0",
-    "origin": "The name of the originator or creator",
-    "origin_url": "The website for this Gem",
+    "license": "Apache-2.0",
+    "license_url": "TBD",
+    "origin": "Amazon Web Services",
+    "origin_url": "https://www.umbra3d.com",
     "type": "Code",
-    "summary": "A short description of this Gem",
+    "summary": "The Umbra Gem integrates the Umbra SDK with O3DE.",
     "canonical_tags": [
         "Gem"
     ],
@@ -18,8 +18,8 @@
         ""
     ],
     "icon_path": "preview.png",
-    "requirements": "Notice of any requirements for this Gem i.e. This requires X other gem",
-    "documentation_url": "Link to any documentation of your Gem",
+    "requirements": "This Gem requires configuring the Umbra SDK path and license key. Refer to the Gem's README.md for details.",
+    "documentation_url": "",
     "dependencies": [
         "Atom_RPI",
         "Atom"

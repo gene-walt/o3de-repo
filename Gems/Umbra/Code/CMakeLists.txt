@@ -35,6 +35,7 @@ endforeach()
 if(NOT found_sdk)
     # If we don't find a path that appears to be a valid Umbra install, we can bail here.
     # No 3rdParty::umbra target will exist, so that can be checked elsewhere.
+    message(WARNING "No Umbra SDK was detected. Make sure to set the 'UMBRA_SDK_PATH' variable to a valid Umbra SDK path. Gem disabled.")
     return()
 endif()
 
@@ -45,6 +46,7 @@ include(${pal_dir}/PAL_${PAL_PLATFORM_NAME_LOWERCASE}.cmake)
 
 # Check to see if building the Gem Modules are supported for the current platform
 if(NOT PAL_TRAIT_UMBRA_SUPPORTED)
+    message(WARNING "The Umbra GEM is not supported on this platform.")
     return()
 endif()
 
@@ -52,6 +54,8 @@ endif()
 if (TARGET ${UMBRA_TARGET})
     return()
 endif()
+
+message(STATUS "The Umbra GEM enabled with the Umbra SDK located at ${UMBRA_SDK_PATH}.")
 
 # set it to a generator expression for multi-config situations
 set(UMBRA_RUNTIME_DEPENDENCIES $<IF:$<CONFIG:Debug>,${UMBRA_LIBRARIES_DEBUG},${UMBRA_LIBRARIES_RELEASE}>)
