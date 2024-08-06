@@ -196,7 +196,7 @@ namespace Umbra
 
                 // Enumerate all visible geometry parts from components attached to this entity.
                 AzFramework::VisibleGeometryContainer geometryContainer;
-                handler->GetVisibleGeometry(AZ::Aabb::CreateNull(), geometryContainer);
+                handler->BuildVisibleGeometry(AZ::Aabb::CreateNull(), geometryContainer);
 
                 // Add each visible geometry part from the container to the umbra scene with a unique part ID.
                 uint32_t partId = 0;
