@@ -44,7 +44,7 @@ namespace Umbra
             AZStd::bind(&UmbraSceneAssetBuilder::CreateJobs, this, AZStd::placeholders::_1, AZStd::placeholders::_2);
         builderDescriptor.m_processJobFunction =
             AZStd::bind(&UmbraSceneAssetBuilder::ProcessJob, this, AZStd::placeholders::_1, AZStd::placeholders::_2);
-        builderDescriptor.m_version = 0;
+        builderDescriptor.m_version = 1;
 
         BusConnect(builderDescriptor.m_busId);
 
@@ -155,6 +155,9 @@ namespace Umbra
         localParams.cacheSizeMegs = 100;
         localParams.numThreads = -1;
 
+        const AZStd::string tempPath = (AZ::IO::FixedMaxPath(AZ::Utils::GetProjectUserPath()) / "umbracache").String();
+        localParams.tempPath = tempPath.c_str();
+
         // Attempt to read the license key from an environment variable instead of relying on license files in the working directory or bin
         // folder.
         char licenseEnvBuffer[256]{};
@@ -191,28 +194,53 @@ namespace Umbra
         computation->release();
 
         // Get file name from source file path, then replace the extension to generate product file name
-        AZStd::string destFileName;
-        AzFramework::StringFunc::Path::GetFullFileName(request.m_fullPath.c_str(), destFileName);
-        AzFramework::StringFunc::Path::ReplaceExtension(destFileName, UmbraSceneAsset::Extension);
+        AZStd::string sceneAssetFileName;
+        AzFramework::StringFunc::Path::GetFullFileName(request.m_fullPath.c_str(), sceneAssetFileName);
+        AzFramework::StringFunc::Path::ReplaceExtension(sceneAssetFileName, UmbraSceneAsset::Extension);
 
         // Construct product full path
-        AZStd::string destPath;
-        AzFramework::StringFunc::Path::ConstructFull(request.m_tempDirPath.c_str(), destFileName.c_str(), destPath, true);
+        AZStd::string sceneAssetPath;
+        AzFramework::StringFunc::Path::ConstructFull(request.m_tempDirPath.c_str(), sceneAssetFileName.c_str(), sceneAssetPath, true);
 
         // Save the asset to binary format for production
-        if (!AZ::Utils::SaveObjectToFile(destPath, AZ::DataStream::ST_BINARY, &sceneAsset, sceneAsset.GetType(), nullptr))
+        if (AZ::Utils::SaveObjectToFile(sceneAssetPath, AZ::DataStream::ST_BINARY, &sceneAsset, sceneAsset.GetType(), nullptr))
+        {
+            AssetBuilderSDK::JobProduct jobProduct;
+            jobProduct.m_dependenciesHandled = true; // This builder has no dependencies to output.
+            jobProduct.m_productFileName = sceneAssetPath;
+            jobProduct.m_productAssetType = sceneAsset.GetType();
+            jobProduct.m_productSubID = 0;
+            response.m_outputProducts.emplace_back(AZStd::move(jobProduct));
+            AZ_TracePrintf("AssetBuilder", "Saved data to file %s \n", sceneAssetPath.c_str());
+        }
+        else
         {
             AZ_Error("UmbraSceneAssetBuilder", false, "Failed to save asset to cache");
             response.m_resultCode = AssetBuilderSDK::ProcessJobResult_Failed;
             return;
         }
 
-        AZ_TracePrintf("AssetBuilder", "Saved data to file %s \n", destPath.c_str());
+        // Save raw dumb file for other systems and debugging
+        AZStd::string tomePath = sceneAssetPath;
+        AzFramework::StringFunc::Path::ReplaceExtension(tomePath, "tome");
+        if (AZ::Utils::SaveStreamToFile(tomePath, sceneAsset.m_tomeBuffer))
+        {
+            AssetBuilderSDK::JobProduct jobProduct;
+            jobProduct.m_dependenciesHandled = true; // This builder has no dependencies to output.
+            jobProduct.m_productFileName = tomePath;
+            // We need a unique asset type identifier for the tone file since it is not directly registered or used by any other system
+            jobProduct.m_productAssetType = AZ::Uuid::CreateString("{956C25FF-AEF1-4E3D-A1A5-85675731A782}");
+            jobProduct.m_productSubID = 1;
+            response.m_outputProducts.emplace_back(AZStd::move(jobProduct));
+            AZ_TracePrintf("AssetBuilder", "Saved raw tome to file %s \n", tomePath.c_str());
+        }
+        else
+        {
+            AZ_Error("UmbraSceneAssetBuilder", false, "Failed to save raw tome to cache");
+            response.m_resultCode = AssetBuilderSDK::ProcessJobResult_Failed;
+            return;
+        }
 
-        // Success. Save output product(s) to response
-        AssetBuilderSDK::JobProduct jobProduct(destPath, sceneAsset.GetType(), 0);
-        jobProduct.m_dependenciesHandled = true; // This builder has no dependencies to output.
-        response.m_outputProducts.push_back(jobProduct);
         response.m_resultCode = AssetBuilderSDK::ProcessJobResult_Success;
     }
 
