@@ -121,7 +121,7 @@ namespace Umbra
                 sceneDescPath.c_str());
         }
 
-        AZ_TracePrintf("AssetBuilder", "Load umbra scene data succeeded\n");
+        AZ_Trace("AssetBuilder", "Load umbra scene data succeeded\n");
 
         // Set up tome computation parameters from scene descriptor.
         Umbra::ComputationParams params;
@@ -185,7 +185,7 @@ namespace Umbra
             return;
         }
 
-        AZ_TracePrintf("AssetBuilder", "Process umbra scene data succeeded\n");
+        AZ_Trace("AssetBuilder", "Process umbra scene data succeeded\n");
 
         // Embed tome buffer directly into scene asset 
         UmbraSceneAsset sceneAsset;
@@ -211,7 +211,7 @@ namespace Umbra
             jobProduct.m_productAssetType = sceneAsset.GetType();
             jobProduct.m_productSubID = 0;
             response.m_outputProducts.emplace_back(AZStd::move(jobProduct));
-            AZ_TracePrintf("AssetBuilder", "Saved data to file %s \n", sceneAssetPath.c_str());
+            AZ_Trace("AssetBuilder", "Saved data to file %s \n", sceneAssetPath.c_str());
         }
         else
         {
@@ -232,7 +232,7 @@ namespace Umbra
             jobProduct.m_productAssetType = AZ::Uuid::CreateString("{956C25FF-AEF1-4E3D-A1A5-85675731A782}");
             jobProduct.m_productSubID = 1;
             response.m_outputProducts.emplace_back(AZStd::move(jobProduct));
-            AZ_TracePrintf("AssetBuilder", "Saved raw tome to file %s \n", tomePath.c_str());
+            AZ_Trace("AssetBuilder", "Saved raw tome to file %s \n", tomePath.c_str());
         }
         else
         {

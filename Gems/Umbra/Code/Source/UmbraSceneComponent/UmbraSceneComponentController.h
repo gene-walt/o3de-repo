@@ -144,7 +144,7 @@ namespace Umbra
             UmbraSceneComponentController& m_controller;
             // Umbra query object that performs occlusion culling queries against the tome
             AZStd::unique_ptr<Umbra::QueryExt> m_query;
-            // Additional working memory for umbrella queries.
+            // Additional working memory for Umbra queries.
             AZStd::vector<AZ::u8> m_queryWorkMem;
             // Vector used as storage for object indices, pre allocating enough space for all object indices in the tome
             AZStd::vector<int32_t> m_objectIndexListStorage;
