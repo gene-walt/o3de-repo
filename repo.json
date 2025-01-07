@@ -1,0 +1,18 @@
+{
+    "repo_name": "AWS O3DE",
+    "display_name": "AWS O3DE",
+    "summary": "A repository to hold various AWS gems, projects, and templates for the O3DE engine.",
+    "additional_info": "See the README.md at the root of this repository for more information",
+    "last_updated": "2025-01-07",
+    "license": "Apache-2.0",
+    "license_path": "LICENSE",
+    "gems": [
+        "Gems/AWSClientAuth",
+        "Gems/AWSCore",
+        "Gems/AWSGameLift",
+        "Gems/AWSMetrics",
+        "Gems/HttpRequestor",
+        "Gems/MetaStream",
+        "Gems/Twitch"
+    ]
+}
