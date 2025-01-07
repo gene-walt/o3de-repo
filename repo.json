@@ -1,5 +1,6 @@
 {
     "repo_name": "AWS O3DE",
+    "origin": "https://github.com/aws/o3de-repo",
     "display_name": "AWS O3DE",
     "summary": "A repository to hold various AWS gems, projects, and templates for the O3DE engine.",
     "additional_info": "See the README.md at the root of this repository for more information",
