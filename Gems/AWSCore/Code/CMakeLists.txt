@@ -29,7 +29,7 @@ ly_add_target(
         PRIVATE
             AZ::AzCore
             AZ::AzFramework
-            AZ::AWSNativeSDKInit
+            Gem::AWSNativeSDKInit.API
         PUBLIC
             3rdParty::AWSNativeSDK::AWSCore
 )
@@ -193,7 +193,7 @@ if(PAL_TRAIT_BUILD_TESTS_SUPPORTED)
             PRIVATE
                 AZ::AzTest
                 AZ::AzFramework
-                AZ::AWSNativeSDKTestLibs
+                AWSNativeSDKTestLibs
                 Gem::${gem_name}.Static
     )
 
@@ -233,7 +233,7 @@ if(PAL_TRAIT_BUILD_TESTS_SUPPORTED)
                     3rdParty::Qt::Gui
                     3rdParty::Qt::Widgets
                     AZ::AzTest
-                    AZ::AWSNativeSDKTestLibs
+                    AWSNativeSDKTestLibs
                     Gem::${gem_name}.Static
                     Gem::${gem_name}.Editor.Static
         )
