@@ -6,21 +6,20 @@
  *
  */
 
-#include "../../../Source/Clients/AWSNativeSDKInit.h"
 
 namespace AWSNativeSDKInit
 {
     namespace Platform
     {
-#if defined(PLATFORM_SUPPORTS_AWS_NATIVE_SDK)
-        void CustomizeSDKOptions(Aws::SDKOptions& options)
-        {
-            AZ_UNUSED(options);
-        }
+        #if defined(PLATFORM_SUPPORTS_AWS_NATIVE_SDK)
+            void CustomizeSDKOptions(Aws::SDKOptions& options)
+            {
+                AZ_UNUSED(options);
+            }
 
-        void CustomizeShutdown()
-        {
-        }
-#endif
+            void CustomizeShutdown()
+            {
+            }
+        #endif
     }
 }

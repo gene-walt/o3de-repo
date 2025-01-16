@@ -8,8 +8,6 @@ set(FILES
     Source/Clients/AWSLogSystemInterface.h
     Source/Clients/AWSMemoryInterface.cpp
     Source/Clients/AWSMemoryInterface.h
-    Source/Clients/AWSNativeSDKInit.cpp
-    Source/Clients/AWSNativeSDKInit.h
 )
 
 
