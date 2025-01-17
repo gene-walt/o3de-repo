@@ -23,7 +23,7 @@
 #include <Framework/AWSApiJob.h>
 #include <ResourceMapping/AWSResourceMappingBus.h>
 #include <ResourceMapping/AWSResourceMappingManager.h>
-#pragma optimize("",off)
+
 namespace AWSCore
 {
     constexpr int DEFAULT_NUMBER_AWS_THREADS = 2;    /// Allow overlapping requests
@@ -193,4 +193,3 @@ namespace AWSCore
         return AwsApiJob::GetDefaultConfig();
     }
 } // namespace AWSCore
-#pragma optimize("",on)

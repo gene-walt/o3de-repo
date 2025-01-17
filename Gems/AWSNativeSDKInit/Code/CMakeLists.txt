@@ -201,9 +201,10 @@ if(PAL_TRAIT_BUILD_TESTS_SUPPORTED)
             PUBLIC
                 Include
                 Tests/Libs
-            PRIVATE
                 Source
         BUILD_DEPENDENCIES
+            PUBLIC
+                ${gem_name}.Private.Object
             PRIVATE
                 3rdParty::AWSNativeSDK::Core
                 AZ::AzCore
