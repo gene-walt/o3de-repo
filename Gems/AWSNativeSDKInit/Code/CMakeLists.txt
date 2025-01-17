@@ -190,6 +190,26 @@ endif()
 ################################################################################
 # See if globally, tests are supported
 if(PAL_TRAIT_BUILD_TESTS_SUPPORTED)
+
+    # AWSNativeSDK Testing Library that AWS Gems can use to help test 
+    ly_add_target(
+        NAME ${gem_name}.TestsLibrary STATIC
+        NAMESPACE Gem
+        FILES_CMAKE
+            awsnativesdkinit_tests_library_files.cmake
+        INCLUDE_DIRECTORIES
+            PUBLIC
+                Include
+                Tests/Libs
+            PRIVATE
+                Source
+        BUILD_DEPENDENCIES
+            PRIVATE
+                3rdParty::AWSNativeSDK::Core
+                AZ::AzCore
+                AZ::AzTest
+    )
+
     # We globally support tests, see if we support tests on this platform for ${gem_name}.Tests
     if(PAL_TRAIT_AWSNATIVESDKINIT_TEST_SUPPORTED)
         # We support ${gem_name}.Tests on this platform, add dependency on the Private Object target
@@ -208,6 +228,7 @@ if(PAL_TRAIT_BUILD_TESTS_SUPPORTED)
                     AZ::AzTest
                     AZ::AzFramework
                     Gem::${gem_name}.Private.Object
+                    3rdParty::AWSNativeSDK::Core
         )
 
         # Add ${gem_name}.Tests to googletest

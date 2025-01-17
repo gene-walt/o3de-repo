@@ -23,7 +23,7 @@
 #include <Framework/AWSApiJob.h>
 #include <ResourceMapping/AWSResourceMappingBus.h>
 #include <ResourceMapping/AWSResourceMappingManager.h>
-
+#pragma optimize("",off)
 namespace AWSCore
 {
     constexpr int DEFAULT_NUMBER_AWS_THREADS = 2;    /// Allow overlapping requests
@@ -90,7 +90,7 @@ namespace AWSCore
 
     void AWSCoreSystemComponent::GetRequiredServices(AZ::ComponentDescriptor::DependencyArrayType& required)
     {
-        AZ_UNUSED(required);
+        required.push_back(AZ_CRC_CE("AWSNativeSDKInitService"));
     }
 
     void AWSCoreSystemComponent::GetDependentServices(AZ::ComponentDescriptor::DependencyArrayType& dependent)
@@ -100,7 +100,7 @@ namespace AWSCore
 
     bool AWSCoreSystemComponent::IsAWSApiInitialized() const
     {
-        return AWSNativeSDKInit::AWSNativeSDKInitInterface::Get()->IsInitialized();
+        return AWSNativeSDKInit::AWSNativeSDKInitInterface::Get() && AWSNativeSDKInit::AWSNativeSDKInitInterface::Get()->IsInitialized();
     }
 
     void AWSCoreSystemComponent::Init()
@@ -193,3 +193,4 @@ namespace AWSCore
         return AwsApiJob::GetDefaultConfig();
     }
 } // namespace AWSCore
+#pragma optimize("",on)

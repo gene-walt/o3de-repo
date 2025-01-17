@@ -128,7 +128,7 @@ if(PAL_TRAIT_BUILD_TESTS_SUPPORTED)
                 Gem::${gem_name}.Client.Static
                 Gem::Multiplayer.Unified.Static
                 3rdParty::AWSNativeSDK::GameLiftClient
-                AZ::AWSNativeSDKTestLibs
+                Gem::AWSNativeSDKInit.TestsLibrary
     )
     # Add ${gem_name}.Client.Tests to googletest
     ly_add_googletest(
