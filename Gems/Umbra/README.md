@@ -1,5 +1,3 @@
-Here's the text with redundant statements eliminated within each paragraph:
-
 # Umbra Gem for O3DE (Open 3D Engine)
 
 The Umbra Gem is compatible with O3DE 24.0.9+.
@@ -15,9 +13,15 @@ To use the Umbra Gem, you must obtain the Umbra SDK and a valid license from the
 
 Download and copy the gem source to a local folder. Register and enable the gem with the O3DE project manager or command line interface.
 
+
 The gem requires configuring the Umbra SDK path and license key. Set the SDK path using the UMBRA_SDK_PATH environment variable or CMake configuration (CMake takes precedence). Rebuild the project after setting the SDK path.
 
-Set the Umbra license key to compute baked occlusion data using the asset builder. Place umbra_license.txt in the binaries folder, or set the UMBRA_LICENSE_KEY environment variable to the value stored in the file. A valid license is required to process scenes and bake data. The assets will not be processed and errors will be reported if the license is invalid. The license is not required for loading, using, or distributing existing scene data with the Umbra runtime. Set the UMBRA_SUPPRESS_LICENSE_DIALOG environment variable to TRUE to prevent the Umbra SDK optimizer from displaying a license-related warning dialog that may disrupt the asset processor.
+CMake configuration
+```
+cmake -B build\windows -S . -DUMBRA_SDK_PATH=<path_to_umbra_library>
+```
+
+Set the Umbra license key to compute baked occlusion data using the asset builder. Place umbra_license.txt in the O3DE binaries folder (a sibling of AssetProcess.exe), or set the UMBRA_LICENSE_KEY environment variable to the value stored in the file. A valid license is required to process scenes and bake data. The assets will not be processed and errors will be reported if the license is invalid. The license is not required for loading, using, or distributing existing scene data with the Umbra runtime. Set the UMBRA_SUPPRESS_LICENSE_DIALOG environment variable to TRUE to prevent the Umbra SDK optimizer from displaying a license-related warning dialog that may disrupt the asset processor.
 
 ## Using the Umbra Gem
 
