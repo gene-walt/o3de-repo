@@ -15,7 +15,7 @@
 #include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/Serialization/EditContext.h>
 
-#include <AWSNativeSDKInit/AWSNativeSDKInit.h>
+#include <AWSNativeSDKInit/AWSNativeSDKInitBus.h>
 
 #include <AWSCoreSystemComponent.h>
 #include <Configuration/AWSCoreConfiguration.h>
@@ -90,7 +90,7 @@ namespace AWSCore
 
     void AWSCoreSystemComponent::GetRequiredServices(AZ::ComponentDescriptor::DependencyArrayType& required)
     {
-        AZ_UNUSED(required);
+        required.push_back(AZ_CRC_CE("AWSNativeSDKInitService"));
     }
 
     void AWSCoreSystemComponent::GetDependentServices(AZ::ComponentDescriptor::DependencyArrayType& dependent)
@@ -100,7 +100,7 @@ namespace AWSCore
 
     bool AWSCoreSystemComponent::IsAWSApiInitialized() const
     {
-        return AWSNativeSDKInit::InitializationManager::IsInitialized();
+        return AWSNativeSDKInit::AWSNativeSDKInitInterface::Get() && AWSNativeSDKInit::AWSNativeSDKInitInterface::Get()->IsInitialized();
     }
 
     void AWSCoreSystemComponent::Init()
@@ -138,10 +138,10 @@ namespace AWSCore
     {
         // Multiple different Gems might try to use the AWSNativeSDK, so make sure it only gets initialized / shutdown once
         // by the first Gem to try using it.
-        m_ownsAwsNativeInitialization = !AWSNativeSDKInit::InitializationManager::IsInitialized();
+        m_ownsAwsNativeInitialization = !AWSNativeSDKInit::AWSNativeSDKInitInterface::Get()->IsInitialized();
         if (m_ownsAwsNativeInitialization)
         {
-            AWSNativeSDKInit::InitializationManager::InitAwsApi();
+            AWSNativeSDKInit::AWSNativeSDKInitInterface::Get()->InitAwsApi();
         }
     }
 
@@ -149,7 +149,7 @@ namespace AWSCore
     {
         if (m_ownsAwsNativeInitialization)
         {
-            AWSNativeSDKInit::InitializationManager::Shutdown();
+            AWSNativeSDKInit::AWSNativeSDKInitInterface::Get()->Shutdown();
         }
     }
 

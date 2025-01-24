@@ -1,0 +1,18 @@
+{
+    "Amazon": {
+        "AssetProcessor": {
+            "Settings": {
+                "ScanFolder AWSNativeSDKInit/Assets": {
+                    "watch": "@GEMROOT:AWSNativeSDKInit@/Assets",
+                    "recursive": 1,
+                    "order": 101
+                },
+                "ScanFolder AWSNativeSDKInit/Registry": {
+                    "watch": "@GEMROOT:AWSNativeSDKInit@/Registry",
+                    "recursive": 1,
+                    "order": 102
+                }
+            }
+        }
+    }
+}

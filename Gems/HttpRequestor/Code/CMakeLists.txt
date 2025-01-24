@@ -22,7 +22,7 @@ ly_add_target(
         PRIVATE
             AZ::AzCore
             AZ::AzFramework
-            AZ::AWSNativeSDKInit
+            Gem::AWSNativeSDKInit.API
         PUBLIC
             3rdParty::AWSNativeSDK::Core
 )

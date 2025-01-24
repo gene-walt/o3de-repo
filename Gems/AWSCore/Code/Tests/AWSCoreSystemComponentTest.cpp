@@ -19,6 +19,7 @@
 #include <AzTest/AzTest.h>
 
 #include <AWSCoreSystemComponent.h>
+#include <Clients/AWSNativeSDKInitSystemComponent.h>
 #include <AWSNativeSDKTestManager.h>
 #include <Configuration/AWSCoreConfiguration.h>
 #include <Credential/AWSCredentialManager.h>
@@ -61,7 +62,8 @@ class AWSCoreSystemComponentTest
 protected:
     AZStd::unique_ptr<AZ::SerializeContext> m_serializeContext;
     AZStd::unique_ptr<AZ::BehaviorContext> m_behaviorContext;
-    AZStd::unique_ptr<AZ::ComponentDescriptor> m_componentDescriptor;
+    AZStd::unique_ptr<AZ::ComponentDescriptor> m_awsCoreComponentDescriptor;
+    AZStd::unique_ptr<AZ::ComponentDescriptor> m_awsNativeSDKInitComponentDescriptor;
 
     void SetUp() override
     {
@@ -71,25 +73,32 @@ protected:
         m_serializeContext->CreateEditContext();
         m_behaviorContext = AZStd::make_unique<AZ::BehaviorContext>();
 
-        m_componentDescriptor.reset(AWSCoreSystemComponent::CreateDescriptor());
-        m_componentDescriptor->Reflect(m_serializeContext.get());
-        m_componentDescriptor->Reflect(m_behaviorContext.get());
+        m_awsCoreComponentDescriptor.reset(AWSCoreSystemComponent::CreateDescriptor());
+        m_awsCoreComponentDescriptor->Reflect(m_serializeContext.get());
+        m_awsCoreComponentDescriptor->Reflect(m_behaviorContext.get());
+        
+        m_awsNativeSDKInitComponentDescriptor.reset(AWSNativeSDKInit::AWSNativeSDKInitSystemComponent::CreateDescriptor());
+        m_awsNativeSDKInitComponentDescriptor->Reflect(m_serializeContext.get());
+        m_awsNativeSDKInitComponentDescriptor->Reflect(m_behaviorContext.get());
 
         m_settingsRegistry->SetContext(m_serializeContext.get());
 
         m_entity = aznew AZ::Entity();
+        m_awsNativeSDKInitSystemsComponent.reset(m_entity->CreateComponent<AWSNativeSDKInit::AWSNativeSDKInitSystemComponent>());
         m_coreSystemsComponent.reset(m_entity->CreateComponent<AWSCoreSystemComponent>());
     }
 
     void TearDown() override
     {
         m_entity->RemoveComponent(m_coreSystemsComponent.get());
-        m_coreSystemsComponent.reset();
+        m_entity->RemoveComponent(m_awsNativeSDKInitSystemsComponent.get());
         delete m_entity;
         m_entity = nullptr;
 
         m_coreSystemsComponent.reset();
-        m_componentDescriptor.reset();
+        m_awsNativeSDKInitSystemsComponent.reset();
+        m_awsCoreComponentDescriptor.reset();
+        m_awsNativeSDKInitComponentDescriptor.reset();
         m_behaviorContext.reset();
         m_serializeContext.reset();
 
@@ -98,6 +107,7 @@ protected:
 
 public:
     AZStd::unique_ptr<AWSCoreSystemComponent> m_coreSystemsComponent;
+    AZStd::unique_ptr<AWSNativeSDKInit::AWSNativeSDKInitSystemComponent> m_awsNativeSDKInitSystemsComponent;
     AZ::Entity* m_entity;
     AWSCoreNotificationsBusMock m_notifications;
 };

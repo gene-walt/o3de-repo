@@ -21,7 +21,7 @@ AZ_PUSH_DISABLE_WARNING(4251 4996, "-Wunknown-warning-option")
 #include <aws/core/client/ClientConfiguration.h>
 AZ_POP_DISABLE_WARNING
 
-#include <AWSNativeSDKInit/AWSNativeSDKInit.h>
+#include <AWSNativeSDKInit/AWSNativeSDKInitBus.h>
 #include <AzCore/std/string/conversions.h>
 #include "HttpRequestManager.h"
 
@@ -38,10 +38,10 @@ namespace HttpRequestor
 
         // Multiple different Gems might try to use the AWSNativeSDK, so make sure it only gets initialized / shutdown once
         // by the first Gem to try using it.
-        m_ownsAwsNativeInitialization = !AWSNativeSDKInit::InitializationManager::IsInitialized();
+        m_ownsAwsNativeInitialization = !AWSNativeSDKInit::AWSNativeSDKInitInterface::Get()->IsInitialized();
         if (m_ownsAwsNativeInitialization)
         {
-            AWSNativeSDKInit::InitializationManager::InitAwsApi();
+            AWSNativeSDKInit::AWSNativeSDKInitInterface::Get()->InitAwsApi();
         }
         auto function = [this]
         {
@@ -62,7 +62,7 @@ namespace HttpRequestor
         // Shutdown after background thread has closed.
         if (m_ownsAwsNativeInitialization)
         {
-            AWSNativeSDKInit::InitializationManager::Shutdown();
+            AWSNativeSDKInit::AWSNativeSDKInitInterface::Get()->Shutdown();
         }
     }
 

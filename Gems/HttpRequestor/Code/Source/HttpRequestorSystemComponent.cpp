@@ -185,7 +185,7 @@ namespace HttpRequestor
 
     void HttpRequestorSystemComponent::GetRequiredServices(AZ::ComponentDescriptor::DependencyArrayType& required)
     {
-        (void)required;
+        required.push_back(AZ_CRC_CE("AWSNativeSDKInitService")); // AWSNativeSDKInit required by HttpRequestor::Manager constructor 
     }
 
     void HttpRequestorSystemComponent::GetDependentServices(AZ::ComponentDescriptor::DependencyArrayType& dependent)
