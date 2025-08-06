@@ -148,7 +148,7 @@ namespace AWSCore
         }
 
         auto settingsRegistryPath = AZ::IO::FixedMaxPath(AZStd::string_view{ m_sourceProjectFolder }) /
-            AZ::SettingsRegistryInterface::RegistryFolder /
+            AZ::SettingsRegistryConstants::RegistryFolder /
             AWSCoreConfiguration::AWSCoreConfigurationFileName;
         if (!settingsRegistry->MergeSettingsFile(settingsRegistryPath.c_str(), AZ::SettingsRegistryInterface::Format::JsonMergePatch, ""))
         {

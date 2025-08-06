@@ -42,7 +42,7 @@ public:
     AWSCoreConfigurationTest()
     {
         m_setRegFilePath = (GetTestTempDirectoryPath() /
-                            AZ::SettingsRegistryInterface::RegistryFolder /
+                            AZ::SettingsRegistryConstants::RegistryFolder /
                             AWSCore::AWSCoreConfiguration::AWSCoreConfigurationFileName).LexicallyNormal();
     }
 

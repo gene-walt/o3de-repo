@@ -70,7 +70,7 @@ namespace AWSCore
 
         // Resolve path to editor_aws_preferences.setreg
         const AZStd::string editorAWSPreferencesFilePath =
-            AZStd::string::format("@user@/%s/%s", AZ::SettingsRegistryInterface::RegistryFolder, EditorAWSPreferencesFileName);
+            AZStd::string::format("@user@/%s/%s", AZ::SettingsRegistryConstants::RegistryFolder, EditorAWSPreferencesFileName);
         AZ::IO::FixedMaxPath resolvedPathAWSPreference;
         if (!fileIO->ResolvePath(resolvedPathAWSPreference, AZ::IO::PathView(editorAWSPreferencesFilePath)))
         {
@@ -201,7 +201,7 @@ namespace AWSCore
                 AZ_Assert(fileIO, "File IO is not initialized.");
 
                 // Resolve path to editor_aws_preferences.setreg
-                const AZStd::string editorPreferencesFilePath = AZStd::string::format("@user@/%s/%s", AZ::SettingsRegistryInterface::RegistryFolder, EditorAWSPreferencesFileName);
+                const AZStd::string editorPreferencesFilePath = AZStd::string::format("@user@/%s/%s", AZ::SettingsRegistryConstants::RegistryFolder, EditorAWSPreferencesFileName);
                 AZ::IO::FixedMaxPath resolvedPathAWSPreference;
                 if (!fileIO->ResolvePath(resolvedPathAWSPreference, AZ::IO::PathView(editorPreferencesFilePath)))
                 {

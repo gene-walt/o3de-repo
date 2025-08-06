@@ -50,8 +50,7 @@ ly_add_target(
         PUBLIC
             AZ::AzCore
             AZ::AzFramework
-        PRIVATE
-            3rdParty::AWSNativeSDK::AWSCore
+            3rdParty::AWSNativeSDK::Core
 )
 
 # Here add ${gem_name} target, it depends on the Private Object library and Public API interface
